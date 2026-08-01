@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 · Title Fonts — VINTAGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Tangerine:wght@700&family=Alex+Brush&family=Mrs+Saint+Delafield&family=Petit+Formal+Script&family=Great+Vibes&family=Parisienne&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#070B14 0%,#111B2D 100%);
+  min-height:100vh;font-family:-apple-system,'Segoe UI',sans-serif;
+  color:rgba(255,255,255,0.85);padding:20px}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 20%,rgba(212,175,55,0.05) 0%,transparent 55%)}
+
+.top{display:flex;align-items:center;gap:24px;padding:12px 28px;margin:0 auto 20px;
+  background:rgba(7,11,20,0.8);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;max-width:1000px}
+.back{color:rgba(255,255,255,0.5);text-decoration:none;font-size:12px}
+.back:hover{color:#6496E6}
+.top .t{font-family:'Pinyon Script',cursive;font-size:26px;
+  background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+.badge{font-size:10px;color:rgba(100,150,230,0.6);border:1px solid rgba(100,150,230,0.2);padding:2px 8px;border-radius:20px}
+
+.intro{max-width:1000px;margin:0 auto 22px;font-size:11.5px;color:rgba(255,255,255,0.4);
+  line-height:1.9;padding:14px 20px;border-radius:14px;
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)}
+
+.list{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+.fc{padding:26px 28px;border-radius:16px;
+  background:rgba(255,255,255,0.04);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.08);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:pointer;position:relative;overflow:hidden}
+.fc:hover{transform:translateY(-3px);border-color:rgba(212,175,55,0.28);
+  box-shadow:0 10px 40px rgba(212,175,55,0.1)}
+.fc.sel{border-color:rgba(212,175,55,0.5);background:rgba(212,175,55,0.04);
+  box-shadow:0 8px 32px rgba(212,175,55,0.14)}
+
+.fh{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.fnum{font-size:11px;color:rgba(212,175,55,0.55);letter-spacing:2px}
+.fname{font-size:14px;font-weight:500;color:rgba(255,255,255,0.9);letter-spacing:.5px}
+.ftag{font-size:9px;padding:2px 9px;border-radius:8px;
+  background:rgba(100,150,230,0.1);color:rgba(140,180,240,0.75);letter-spacing:.5px}
+.ftag.rec{background:rgba(212,175,55,0.13);color:rgba(212,175,55,0.9)}
+.fsub{font-size:10.5px;color:rgba(255,255,255,0.32);margin-bottom:18px;line-height:1.7}
+
+.showcase{display:flex;align-items:center;gap:34px;flex-wrap:wrap;
+  padding:22px 0 18px;border-top:1px solid rgba(255,255,255,0.05);
+  border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:14px}
+.big{font-size:64px;line-height:1.35;letter-spacing:2px;
+  background:linear-gradient(135deg,#F3A183 0%,#D4AF37 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 18px rgba(212,175,55,0.22))}
+.scale{display:flex;align-items:baseline;gap:26px;flex:1;min-width:260px}
+.sci{text-align:center}
+.sci .v{background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1.5px;line-height:1.4}
+.sci .n{font-size:8.5px;color:rgba(255,255,255,0.25);margin-top:4px;letter-spacing:1px}
+
+.apply{display:flex;gap:12px;flex-wrap:wrap}
+.mini{flex:1;min-width:150px;padding:12px 14px;border-radius:12px;
+  background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05)}
+.mini .lb{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.mini .tt{background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;line-height:1.4}
+.mini .sub2{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:3px;margin-top:3px}
+
+.pick{position:absolute;top:20px;right:24px;font-size:9px;padding:4px 11px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);letter-spacing:1px;transition:.25s}
+.fc.sel .pick{background:rgba(212,175,55,0.18);border-color:rgba(212,175,55,0.4);color:#D4AF37}
+
+/* fonts */
+.f1{font-family:'Pinyon Script',cursive}
+.f2{font-family:'Tangerine',cursive;font-weight:700}
+.f3{font-family:'Alex Brush',cursive}
+.f4{font-family:'Mrs Saint Delafield',cursive}
+.f5{font-family:'Petit Formal Script',cursive}
+.f6{font-family:'Great Vibes',cursive}
+.f7{font-family:'Parisienne',cursive}
+
+.old{max-width:1000px;margin:26px auto 0;padding:20px 26px;border-radius:16px;
+  background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.09)}
+.old h4{font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-bottom:14px;text-transform:uppercase}
+.oldrow{display:flex;gap:40px;align-items:baseline;flex-wrap:wrap}
+.oldrow div{text-align:center}
+.oldrow .ov{font-size:38px;color:rgba(255,255,255,0.35);letter-spacing:2px}
+.oldrow .on{font-size:9px;color:rgba(255,255,255,0.22);margin-top:2px}
+
+.nav-bot{text-align:center;margin-top:28px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bot a{color:rgba(255,255,255,0.38);text-decoration:none;font-size:12px;margin:0 14px}
+.nav-bot a:hover{color:#D4AF37}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="back" href="index.html">← Hub</a>
+  <div class="t">Vintage</div>
+  <span class="badge">06 · Title Fonts</span>
+</div>
+
+<div class="intro">
+  5 款免费商用的英式 / 法式鹅毛笔手写体（Google Fonts，全部可直接嵌入 APP）。<br>
+  每款展示：<b style="color:rgba(255,255,255,.6)">大字样 → 三档实际字号 → 侧边栏 / 登录页 / 手机端头部的落地效果</b>。全部已套用琥珀金渐变 <code style="color:rgba(212,175,55,.7)">#F3A183 → #D4AF37</code> + 字距 2px。<br>
+  点击卡片右上角可标记你的选择 —— 看好之后告诉我编号即可。
+</div>
+
+<div class="list">
+
+  <!-- 01 Pinyon Script -->
+  <div class="fc sel" onclick="sel(this)">
+    <div class="pick">✓ 当前默认</div>
+    <div class="fh"><span class="fnum">01</span><span class="fname">Pinyon Script</span><span class="ftag rec">★ 最贴近你的附件图</span></div>
+    <div class="fsub">18 世纪法式铜版雕刻手写体（Copperplate）。大写 V 带完整卷首回环，粗细对比强烈——细笔如发丝、重笔饱满，正是附件图里那种"钢笔压出来"的质感。小尺寸下依然优雅不糊。</div>
+    <div class="showcase">
+      <div class="big f1">Vintage</div>
+      <div class="scale">
+        <div class="sci"><div class="v f1" style="font-size:36px">Vintage</div><div class="n">36pt · 主标题</div></div>
+        <div class="sci"><div class="v f1" style="font-size:26px">Vintage</div><div class="n">26pt · 侧栏</div></div>
+        <div class="sci"><div class="v f1" style="font-size:18px">Vintage</div><div class="n">18pt · 小标</div></div>
+      </div>
+    </div>
+    <div class="apply">
+      <div class="mini"><div class="lb">Sidebar</div><div class="tt f1" style="font-size:24px">Vintage</div></div>
+      <div class="mini"><div class="lb">Login</div><div class="tt f1" style="font-size:30px">Vintage</div><div class="sub2">ENTER STARPORT</div></div>
+      <div class="mini"><div class="lb">Mobile Header</div><div class="tt f1" style="font-size:28px">Vintage</div></div>
+    </div>
+  </div>
+
+  <!-- 02 Tangerine Bold -->
+  <div class="fc" onclick="sel(this)">
+    <div class="pick">选择</div>
+    <div class="fh"><span class="fnum">02</span><span class="fname">Tangerine Bold</span><span class="ftag">笔锋最锐 · 加粗版</span></div>
+    <div class="fsub">英式鹅毛笔正统写法，Bold 700 字重。笔画起收带明显的尖锋与飞白，字形偏窄挺拔，最有"羽毛笔蘸墨书写"的手感。适合想要更硬朗、更古典的气质。</div>
+    <div class="showcase">
+      <div class="big f2" style="font-size:78px">Vintage</div>
+      <div class="scale">
+        <div class="sci"><div class="v f2" style="font-size:46px">Vintage</div><div class="n">主标题</div></div>
+        <div class="sci"><div class="v f2" style="font-size:34px">Vintage</div><div class="n">侧栏</div></div>
+        <div class="sci"><div class="v f2" style="font-size:24px">Vintage</div><div class="n">小标</div></div>
+      </div>
+    </div>
+    <div class="apply">
+      <div class="mini"><div class="lb">Sidebar</div><div class="tt f2" style="font-size:30px">Vintage</div></div>
+      <div class="mini"><div class="lb">Login</div><div class="tt f2" style="font-size:38px">Vintage</div><div class="sub2">ENTER STARPORT</div></div>
+      <div class="mini"><div class="lb">Mobile Header</div><div class="tt f2" style="font-size:36px">Vintage</div></div>
+    </div>
+  </div>
+
+  <!-- 03 Alex Brush -->
+  <div class="fc" onclick="sel(this)">
+    <div class="pick">选择</div>
+    <div class="fh"><span class="fnum">03</span><span class="fname">Alex Brush</span><span class="ftag">最饱满 · 视觉重量大</span></div>
+    <div class="fsub">法式毛笔连笔体。笔画整体更粗更圆润，连笔顺滑一气呵成，在深色背景上"存在感"最强——如果你觉得之前的字体太细太生硬，这款是最直接的解药。</div>
+    <div class="showcase">
+      <div class="big f3" style="font-size:70px">Vintage</div>
+      <div class="scale">
+        <div class="sci"><div class="v f3" style="font-size:40px">Vintage</div><div class="n">主标题</div></div>
+        <div class="sci"><div class="v f3" style="font-size:29px">Vintage</div><div class="n">侧栏</div></div>
+        <div class="sci"><div class="v f3" style="font-size:20px">Vintage</div><div class="n">小标</div></div>
+      </div>
+    </div>
+    <div class="apply">
+      <div class="mini"><div class="lb">Sidebar</div><div class="tt f3" style="font-size:26px">Vintage</div></div>
+      <div class="mini"><div class="lb">Login</div><div class="tt f3" style="font-size:33px">Vintage</div><div class="sub2">ENTER STARPORT</div></div>
+      <div class="mini"><div class="lb">Mobile Header</div><div class="tt f3" style="font-size:31px">Vintage</div></div>
+    </div>
+  </div>
+
+  <!-- 04 Mrs Saint Delafield -->
+  <div class="fc" onclick="sel(this)">
+    <div class="pick">选择</div>
+    <div class="fh"><span class="fnum">04</span><span class="fname">Mrs Saint Delafield</span><span class="ftag">签名感 · 最随性</span></div>
+    <div class="fsub">19 世纪英伦私人书信签名体。字母倾斜角度大、连笔拉得长，带有真人手写的不规则节奏——最不"电脑感"、最像从旧信封上剪下来的一行字。</div>
+    <div class="showcase">
+      <div class="big f4" style="font-size:72px">Vintage</div>
+      <div class="scale">
+        <div class="sci"><div class="v f4" style="font-size:42px">Vintage</div><div class="n">主标题</div></div>
+        <div class="sci"><div class="v f4" style="font-size:30px">Vintage</div><div class="n">侧栏</div></div>
+        <div class="sci"><div class="v f4" style="font-size:21px">Vintage</div><div class="n">小标</div></div>
+      </div>
+    </div>
+    <div class="apply">
+      <div class="mini"><div class="lb">Sidebar</div><div class="tt f4" style="font-size:27px">Vintage</div></div>
+      <div class="mini"><div class="lb">Login</div><div class="tt f4" style="font-size:35px">Vintage</div><div class="sub2">ENTER STARPORT</div></div>
+      <div class="mini"><div class="lb">Mobile Header</div><div class="tt f4" style="font-size:32px">Vintage</div></div>
+    </div>
+  </div>
+
+  <!-- 05 Petit Formal Script -->
+  <div class="fc" onclick="sel(this)">
+    <div class="pick">选择</div>
+    <div class="fh"><span class="fnum">05</span><span class="fname">Petit Formal Script</span><span class="ftag">最规整 · 可读性最高</span></div>
+    <div class="fsub">正式法式手写体，字形端正、间距均匀、几乎不飘。牺牲一点花哨换来极高的辨识度——如果标题要出现在 APP 图标、启动页这类超小尺寸场景，这款最稳。</div>
+    <div class="showcase">
+      <div class="big f5" style="font-size:56px">Vintage</div>
+      <div class="scale">
+        <div class="sci"><div class="v f5" style="font-size:32px">Vintage</div><div class="n">主标题</div></div>
+        <div class="sci"><div class="v f5" style="font-size:23px">Vintage</div><div class="n">侧栏</div></div>
+        <div class="sci"><div class="v f5" style="font-size:16px">Vintage</div><div class="n">小标</div></div>
+      </div>
+    </div>
+    <div class="apply">
+      <div class="mini"><div class="lb">Sidebar</div><div class="tt f5" style="font-size:21px">Vintage</div></div>
+      <div class="mini"><div class="lb">Login</div><div class="tt f5" style="font-size:27px">Vintage</div><div class="sub2">ENTER STARPORT</div></div>
+      <div class="mini"><div class="lb">Mobile Header</div><div class="tt f5" style="font-size:25px">Vintage</div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="old">
+  <h4>对照 · 之前用过的两款（供你判断差别）</h4>
+  <div class="oldrow">
+    <div><div class="ov f6">Vintage</div><div class="on">Great Vibes · V5→V6 版本</div></div>
+    <div><div class="ov f7">Vintage</div><div class="on">Parisienne · V5 版本</div></div>
+  </div>
+</div>
+
+<div class="nav-bot">
+  <a href="sec-03-mobile.html">← Mobile</a>
+  <a href="sec-04-interact.html">Interaction →</a>
+  <a href="index.html">Hub</a>
+</div>
+
+<script>
+function sel(el){
+  document.querySelectorAll('.fc').forEach(c=>{c.classList.remove('sel');c.querySelector('.pick').textContent='选择';});
+  el.classList.add('sel');
+  el.querySelector('.pick').textContent='✓ 已选';
+}
+</script>
+</body>
+</html>

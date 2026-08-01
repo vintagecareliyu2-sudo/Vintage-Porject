@@ -1,0 +1,18 @@
+# VINTAGE — Render 一键部署配置（Blueprint）
+# 用途：在 Render 的 "Blueprints" 页面选择本仓库后自动按此配置建服务。
+# 免费套餐即可运行（零依赖 Node）。
+services:
+  - type: web
+    name: vintage
+    runtime: node
+    plan: free
+    region: oregon          # 可选：singapore / oregon / frankfurt / virginia
+    branch: main            # 推送到的分支名（若你用 master 请改这里）
+    buildCommand: "echo 'no build needed (zero-dependency node)'"
+    startCommand: "node server/server.js"
+    healthCheckPath: /api/ping
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PORT
+        sync: false          # Render 自动注入，无需手填

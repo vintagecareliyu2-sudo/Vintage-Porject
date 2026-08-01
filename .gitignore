@@ -1,0 +1,11 @@
+# 运行时账号数据（含隐私，勿提交）
+server/data/
+
+# 依赖 / 系统
+node_modules/
+.env
+*.log
+.DS_Store
+
+# 项目记忆（非代码）
+.workbuddy/

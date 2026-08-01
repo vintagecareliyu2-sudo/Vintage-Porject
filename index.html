@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VINTAGE · Design Preview Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:linear-gradient(135deg,#070B14 0%,#111B2D 100%);
+  min-height:100vh;
+  font-family:-apple-system,'Segoe UI',sans-serif;
+  color:rgba(255,255,255,0.85);
+  display:flex;align-items:center;justify-content:center;
+  overflow:auto;
+  position:relative;
+}
+body::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 30% 20%,rgba(212,175,55,0.04) 0%,transparent 50%),
+              radial-gradient(ellipse at 70% 80%,rgba(243,161,131,0.03) 0%,transparent 50%);
+  pointer-events:none;
+}
+.hub{
+  text-align:center;z-index:1;max-width:640px;width:90%;padding:60px 40px;
+  background:rgba(255,255,255,0.04);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:20px;
+}
+.title{
+  font-family:'Pinyon Script',cursive;font-size:52px;
+  background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:2px;margin-bottom:4px;
+  text-shadow:0 0 30px rgba(212,175,55,0.15),0 0 60px rgba(212,175,55,0.08);
+  filter:brightness(1.1);
+}
+.sub{font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:5px;text-transform:uppercase;margin-bottom:48px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.hub{max-height:94vh;overflow-y:auto}
+.card{
+  display:block;padding:28px 20px;border-radius:16px;text-decoration:none;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);transition:all 0.3s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer;color:inherit;
+}
+.card:hover{
+  transform:translateY(-3px) scale(1.02);
+  border-color:rgba(100,150,230,0.25);
+  box-shadow:0 8px 32px rgba(100,150,230,0.1);
+  background:rgba(255,255,255,0.06);
+}
+.card:active{transform:scale(0.96)}
+.num{
+  font-family:'Pinyon Script',cursive;font-size:28px;
+  color:rgba(100,150,230,0.6);margin-bottom:6px
+}
+.card h3{font-size:15px;font-weight:500;margin-bottom:4px;color:rgba(255,255,255,0.9)}
+.card p{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.6}
+.footer{margin-top:36px;font-size:10px;color:rgba(255,255,255,0.18)}
+.selected-tag{display:inline-block;font-size:9px;padding:2px 7px;border-radius:8px;background:rgba(100,150,230,0.12);color:rgba(140,180,240,0.8);margin-left:6px}
+</style>
+</head>
+<body>
+<div class="hub">
+  <div class="title">Vintage</div>
+  <div class="sub">Design Preview Hub</div>
+  <div class="grid">
+    <a class="card" href="sec-00-icon.html">
+      <div class="num">00</div>
+      <h3>APP 图标<span class="selected-tag">已选 深空蓝</span></h3>
+      <p>星球主题 · 三色方案<br>深空蓝 / 陨石灰 / 琥珀金</p>
+    </a>
+    <a class="card" href="sec-01-desktop.html">
+      <div class="num">01</div>
+      <h3>桌面端布局</h3>
+      <p>侧边栏 + 主内容区<br>玻璃拟态卡片</p>
+    </a>
+    <a class="card" href="sec-02-login.html">
+      <div class="num">02</div>
+      <h3>登录界面</h3>
+      <p>ENTER STARPORT<br>邮箱 / 手机号认证</p>
+    </a>
+    <a class="card" href="sec-03-mobile.html">
+      <div class="num">03</div>
+      <h3>手机端<span class="selected-tag">光轨流辉</span></h3>
+      <p>方案 B 导航已锁定<br>Z 轴卡片分层 + 呼吸光晕</p>
+    </a>
+    <a class="card" href="sec-04-interact.html">
+      <div class="num">04</div>
+      <h3>交互微动效</h3>
+      <p>粒子喷溅 · 轨道进度环<br>弹性按压 · 数字滚动</p>
+    </a>
+    <a class="card" href="sec-05-spec.html">
+      <div class="num">05</div>
+      <h3>CSS 规范代码库</h3>
+      <p>可直接复用的全部设计令牌<br>颜色 / 字体 / 图标 / 动效</p>
+    </a>
+    <a class="card" href="sec-06-fonts.html" style="grid-column:1/-1;border-color:rgba(212,175,55,0.28);background:rgba(212,175,55,0.05)">
+      <div class="num" style="color:rgba(212,175,55,0.75)">06</div>
+      <h3>主标题字体 · 5 款方案<span class="selected-tag" style="background:rgba(212,175,55,0.14);color:rgba(212,175,55,0.9)">待你选择</span></h3>
+      <p>Pinyon Script / Tangerine Bold / Alex Brush / Mrs Saint Delafield / Petit Formal Script</p>
+    </a>
+  </div>
+  <div class="footer">VINTAGE · Space Age Retro · Deep Space Blue Scheme</div>
+</div>
+</body>
+</html>

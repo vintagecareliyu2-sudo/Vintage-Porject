@@ -1,0 +1,14 @@
+{
+  "name": "vintage-cloud",
+  "version": "1.0.0",
+  "description": "VINTAGE 星港待办 · 网页版 + 云同步后端（零依赖 Node）",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true
+}

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VINTAGE TO DO LIST · V2 设计预览</title>
+<style>
+  :root{
+    --bg:#070b18;
+    --bg2:#0b1226;
+    --panel:rgba(13,20,42,.72);
+    --line:rgba(248,243,170,.22);
+    --line2:rgba(248,243,170,.45);
+    --ink:#f8f3aa;
+    --ink-dim:#cfc98c;
+    --ink-faint:#9a955f;
+    --glow:0 0 8px rgba(248,243,170,.55),0 0 22px rgba(248,243,170,.18);
+    --done:#7f8b5a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"Georgia","Times New Roman","Noto Serif SC","SimSun",serif;overflow-x:hidden;}
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 30%,transparent 40%,rgba(3,5,12,.75) 100%);}
+  .wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:40px 28px 90px;}
+
+  .hero{text-align:center;padding:40px 0 24px;}
+  .hero .deco{letter-spacing:.6em;font-size:12px;color:var(--ink-faint);text-transform:uppercase;}
+  .hero h1{font-size:48px;letter-spacing:.16em;margin:14px 0 10px;font-weight:700;text-shadow:var(--glow);}
+  .hero .sub{color:var(--ink-dim);font-size:14px;letter-spacing:.22em;}
+  .hero .rule{width:280px;margin:22px auto 0;border:none;border-top:1px solid var(--line2);position:relative;}
+  .hero .rule::after{content:"✦";position:absolute;left:50%;top:-11px;transform:translateX(-50%);
+    background:var(--bg);padding:0 12px;color:var(--ink);font-size:14px;}
+
+  .sec{margin-top:70px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap;}
+  .sec-head .no{font-size:28px;color:var(--ink-faint);font-style:italic;}
+  .sec-head h2{font-size:22px;letter-spacing:.1em;text-shadow:var(--glow);}
+  .sec-desc{color:var(--ink-dim);font-size:13.5px;line-height:1.9;margin-bottom:20px;max-width:860px;}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:3px 12px;
+    font-size:10.5px;color:var(--ink-faint);letter-spacing:.15em;margin-left:10px;vertical-align:middle;}
+  .new{border-color:var(--line2);color:var(--ink);text-shadow:var(--glow);}
+
+  .frame{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    box-shadow:0 0 0 1px rgba(0,0,0,.4),0 18px 50px rgba(0,0,0,.55),inset 0 0 60px rgba(8,12,30,.6);
+    backdrop-filter:blur(3px);overflow:hidden;}
+  .frame .bar{display:flex;align-items:center;gap:8px;padding:10px 16px;
+    border-bottom:1px solid var(--line);background:rgba(8,12,28,.6);}
+  .frame .bar i{width:10px;height:10px;border-radius:50%;border:1px solid var(--line2);display:inline-block;}
+  .frame .bar span{margin-left:8px;font-size:11px;letter-spacing:.28em;color:var(--ink-faint);}
+  .gap{height:16px;}
+
+  .btn{border:1px solid var(--line2);border-radius:6px;padding:9px 16px;font-size:12.5px;
+    color:var(--ink);letter-spacing:.08em;background:rgba(248,243,170,.06);text-shadow:var(--glow);white-space:nowrap;}
+  .btn.small{padding:4px 11px;font-size:11px;}
+  .hint{margin-top:12px;font-size:11.5px;color:var(--ink-faint);letter-spacing:.05em;line-height:1.8;}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;padding:12px 20px 0;}
+  .tab{padding:8px 18px;font-size:12.5px;letter-spacing:.1em;color:var(--ink-faint);
+    border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:rgba(8,12,28,.4);}
+  .tab.on{color:var(--ink);text-shadow:var(--glow);background:rgba(248,243,170,.08);border-color:var(--line2);}
+
+  /* 待办列表（一级） */
+  .todo-box{padding:20px 24px;}
+  .todo-add{display:flex;gap:10px;margin-bottom:16px;}
+  .todo-add .inp{flex:1;border:1px dashed var(--line2);border-radius:6px;padding:9px 14px;
+    color:var(--ink-faint);font-size:13px;font-style:italic;background:rgba(8,12,28,.4);}
+  .titem{display:flex;align-items:center;gap:14px;padding:12px 6px;border-bottom:1px dashed var(--line);}
+  .cb{width:18px;height:18px;border:1px solid var(--ink-dim);border-radius:4px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .cb.done{background:rgba(248,243,170,.12);border-color:var(--ink);color:var(--ink);}
+  .titem .txt{flex:1;font-size:14px;}
+  .titem.finished .txt{color:var(--done);text-decoration:line-through;}
+  .badge{font-size:10px;color:var(--ink-faint);border:1px solid var(--line);border-radius:10px;padding:1px 8px;}
+  .arrow{color:var(--ink-faint);font-size:14px;}
+  .del{color:var(--ink-faint);font-size:15px;}
+
+  /* 详情页（二级） */
+  .detail{padding:20px 24px;}
+  .crumb{font-size:11px;color:var(--ink-faint);letter-spacing:.12em;margin-bottom:14px;}
+  .crumb b{color:var(--ink);font-weight:400;text-shadow:var(--glow);}
+  .detail h4{font-size:17px;letter-spacing:.08em;margin-bottom:14px;text-shadow:var(--glow);}
+  .gallery{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .thumb{width:78px;height:78px;border-radius:6px;border:1px solid var(--line2);
+    background:linear-gradient(135deg,rgba(248,243,170,.25),rgba(90,110,190,.35)),
+      repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 4px,transparent 4px 8px);
+    display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;}
+  .thumb .zoom{position:absolute;right:3px;bottom:3px;font-size:10px;opacity:.8;}
+  .thumb.add{background:rgba(8,12,28,.4);border-style:dashed;flex-direction:column;font-size:18px;}
+  .thumb.add span{font-size:9px;color:var(--ink-faint);margin-top:2px;}
+  .memo{border:1px dashed var(--line2);border-radius:8px;padding:12px 14px;font-size:12.5px;
+    color:var(--ink-dim);line-height:1.9;font-style:italic;
+    background:repeating-linear-gradient(transparent 0 25px,rgba(248,243,170,.06) 25px 26px);}
+
+  /* 网址收藏 */
+  .links{padding:20px 24px;}
+  .lk{display:flex;align-items:center;gap:12px;padding:11px 6px;border-bottom:1px dashed var(--line);}
+  .lk .fav{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:13px;background:rgba(8,12,28,.5);}
+  .lk .lt{flex:1;min-width:0;}
+  .lk .lt b{font-size:13px;font-weight:400;display:block;}
+  .lk .lt span{font-size:10.5px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;display:block;max-width:420px;}
+  .lk .go{font-size:11px;color:var(--ink);border:1px solid var(--line2);border-radius:5px;
+    padding:3px 10px;text-shadow:var(--glow);}
+
+  /* 国旗 SVG */
+  .flag{width:22px;height:15px;border-radius:2px;overflow:hidden;flex-shrink:0;
+    box-shadow:0 0 0 1px rgba(248,243,170,.35),0 0 8px rgba(248,243,170,.15);display:inline-block;vertical-align:-2px;}
+
+  /* 月份缩略视图 */
+  .months{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;}
+  .mcard{border:1px solid var(--line);border-radius:8px;padding:12px;background:rgba(9,14,32,.5);text-align:center;}
+  .mcard.on{border-color:var(--line2);box-shadow:0 0 12px rgba(248,243,170,.15);}
+  .mcard b{font-size:13px;letter-spacing:.12em;font-weight:400;display:block;margin-bottom:8px;}
+  .mcard.on b{text-shadow:var(--glow);}
+  .mini{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .mini i{aspect-ratio:1;border-radius:2px;background:rgba(248,243,170,.08);}
+  .mini i.h{background:rgba(248,243,170,.55);box-shadow:0 0 4px rgba(248,243,170,.4);}
+  .mcard .pct{font-size:10px;color:var(--ink-faint);margin-top:8px;letter-spacing:.1em;}
+  .mcard.on .pct{color:var(--ink);}
+
+  /* 周条形视图 */
+  .weeks{padding:20px 24px;}
+  .wrow{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .wrow .wl{width:88px;font-size:11.5px;color:var(--ink-dim);letter-spacing:.06em;flex-shrink:0;}
+  .wbar{flex:1;display:flex;gap:5px;}
+  .wbar i{flex:1;height:26px;border-radius:4px;border:1px solid var(--line);
+    background:rgba(8,12,28,.5);display:flex;align-items:center;justify-content:center;
+    font-size:9px;color:var(--ink-faint);font-style:normal;}
+  .wbar i.h{background:rgba(248,243,170,.18);border-color:var(--line2);color:var(--ink);text-shadow:var(--glow);}
+  .wbar i.h::after{content:" ✓";}
+  .wbar i.today{border-color:var(--ink);box-shadow:0 0 8px rgba(248,243,170,.35);}
+  .wrow .wp{width:56px;text-align:right;font-size:11px;color:var(--ink-dim);flex-shrink:0;font-variant-numeric:tabular-nums;}
+
+  /* EUR trvl */
+  .trvl{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;padding:20px;}
+  .map-embed{border:1px solid var(--line2);border-radius:8px;min-height:300px;position:relative;overflow:hidden;
+    background:
+      radial-gradient(circle at 28% 38%,rgba(90,120,220,.28),transparent 45%),
+      radial-gradient(circle at 72% 66%,rgba(248,243,170,.12),transparent 40%),
+      #0d1430;}
+  .map-grid{position:absolute;inset:0;
+    background:repeating-linear-gradient(0deg,rgba(248,243,170,.06) 0 1px,transparent 1px 32px),
+      repeating-linear-gradient(90deg,rgba(248,243,170,.06) 0 1px,transparent 1px 32px);}
+  .map-embed .chrome{position:absolute;top:0;left:0;right:0;padding:8px 12px;display:flex;gap:8px;align-items:center;
+    background:rgba(5,8,18,.85);border-bottom:1px solid var(--line);font-size:10.5px;color:var(--ink-faint);z-index:2;}
+  .map-embed .chrome .url{flex:1;border:1px solid var(--line);border-radius:4px;padding:3px 10px;
+    letter-spacing:.03em;color:var(--ink-dim);font-family:monospace;}
+  .pin{position:absolute;font-size:18px;filter:drop-shadow(0 0 6px rgba(248,243,170,.6));z-index:1;}
+  .route{position:absolute;left:18%;top:38%;width:60%;height:34%;border:none;
+    border-top:2px dashed rgba(248,243,170,.5);transform:rotate(14deg);}
+  .map-ctl{position:absolute;right:10px;bottom:44px;display:flex;flex-direction:column;gap:6px;z-index:2;}
+  .map-ctl b{width:26px;height:26px;border:1px solid var(--line2);border-radius:5px;background:rgba(5,8,18,.85);
+    display:flex;align-items:center;justify-content:center;font-weight:400;font-size:14px;}
+  .map-label{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;z-index:2;
+    background:linear-gradient(transparent,rgba(5,8,18,.92));font-size:11.5px;color:var(--ink-dim);
+    display:flex;justify-content:space-between;align-items:center;}
+  .side-stack{display:flex;flex-direction:column;gap:14px;}
+  .plan-card{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:rgba(9,14,32,.5);}
+  .plan-card h5{font-size:13.5px;letter-spacing:.14em;margin-bottom:10px;text-shadow:var(--glow);}
+  .plan-it{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;color:var(--ink-dim);}
+  .plan-it b{color:var(--ink);font-weight:400;min-width:48px;font-variant-numeric:tabular-nums;}
+  .lug{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;color:var(--ink-dim);}
+  .lug.ok{color:var(--done);text-decoration:line-through;}
+  .lug .cb{width:15px;height:15px;font-size:11px;}
+  .prog{height:6px;border-radius:3px;background:rgba(248,243,170,.1);margin-top:10px;overflow:hidden;}
+  .prog i{display:block;height:100%;width:62%;background:linear-gradient(90deg,rgba(248,243,170,.5),rgba(248,243,170,.9));
+    box-shadow:0 0 8px rgba(248,243,170,.5);}
+
+  /* 双端 mockup */
+  .devices{display:flex;gap:30px;align-items:flex-start;justify-content:center;padding:24px;flex-wrap:wrap;}
+  .laptop{flex:1;min-width:420px;max-width:640px;}
+  .laptop .screen{border:2px solid rgba(248,243,170,.3);border-radius:12px 12px 0 0;overflow:hidden;
+    background:var(--bg2);box-shadow:0 0 30px rgba(0,0,0,.5);}
+  .laptop .base{height:14px;background:linear-gradient(#1a2244,#0c1228);border-radius:0 0 14px 14px;
+    border:1px solid var(--line);border-top:none;position:relative;}
+  .laptop .base::after{content:"";position:absolute;left:50%;top:2px;transform:translateX(-50%);
+    width:90px;height:5px;border-radius:0 0 5px 5px;background:rgba(248,243,170,.12);}
+  .mini-layout{display:flex;min-height:300px;}
+  .mini-side{width:150px;border-right:1px solid var(--line);padding:12px 0;background:rgba(6,10,24,.55);flex-shrink:0;}
+  .mini-side .lg{padding:0 14px 10px;border-bottom:1px dashed var(--line);margin-bottom:8px;}
+  .mini-side .lg b{font-size:11px;letter-spacing:.1em;text-shadow:var(--glow);}
+  .mini-side a{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:10.5px;color:var(--ink-dim);}
+  .mini-side a.on{color:var(--ink);background:linear-gradient(90deg,rgba(248,243,170,.08),transparent);
+    border-left:2px solid var(--ink);text-shadow:var(--glow);}
+  .mini-side .flag{width:15px;height:10px;}
+  .mini-main{flex:1;padding:16px 18px;}
+  .mini-main h6{font-size:15px;letter-spacing:.08em;text-shadow:var(--glow);margin-bottom:4px;}
+  .mini-main .dt{font-size:9px;color:var(--ink-faint);letter-spacing:.2em;margin-bottom:12px;}
+  .mini-stat{display:flex;gap:8px;margin-bottom:12px;}
+  .mini-stat div{flex:1;border:1px solid var(--line);border-radius:6px;padding:8px;background:rgba(10,16,36,.5);}
+  .mini-stat b{font-size:14px;display:block;text-shadow:var(--glow);}
+  .mini-stat span{font-size:8.5px;color:var(--ink-faint);letter-spacing:.1em;}
+  .mini-item{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px dashed var(--line);font-size:11px;color:var(--ink-dim);}
+  .mini-item .cb{width:12px;height:12px;font-size:9px;}
+
+  .phone{width:250px;flex-shrink:0;border:2px solid rgba(248,243,170,.3);border-radius:28px;overflow:hidden;
+    background:var(--bg2);box-shadow:0 0 30px rgba(0,0,0,.5);position:relative;}
+  .phone .notch{height:22px;display:flex;align-items:center;justify-content:center;}
+  .phone .notch i{width:70px;height:8px;border-radius:5px;background:rgba(248,243,170,.15);}
+  .phone .ph-head{text-align:center;padding:8px 14px 10px;border-bottom:1px dashed var(--line);}
+  .phone .ph-head b{font-size:13px;letter-spacing:.14em;text-shadow:var(--glow);}
+  .phone .ph-head span{display:block;font-size:8px;color:var(--ink-faint);letter-spacing:.3em;margin-top:2px;}
+  .ph-body{padding:12px 14px;min-height:270px;}
+  .ph-card{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(9,14,32,.5);margin-bottom:9px;
+    display:flex;align-items:center;gap:10px;}
+  .ph-card .ic{font-size:15px;}
+  .ph-card b{font-size:11.5px;font-weight:400;letter-spacing:.05em;flex:1;}
+  .ph-card span{font-size:9px;color:var(--ink-faint);}
+  .ph-nav{display:flex;border-top:1px solid var(--line);background:rgba(6,10,24,.8);}
+  .ph-nav div{flex:1;text-align:center;padding:9px 0 12px;font-size:14px;opacity:.5;}
+  .ph-nav div.on{opacity:1;filter:drop-shadow(0 0 6px rgba(248,243,170,.6));}
+  .ph-nav div span{display:block;font-size:7.5px;color:var(--ink-faint);letter-spacing:.1em;margin-top:2px;}
+  .ph-nav div.on span{color:var(--ink);}
+
+  /* 同步示意 */
+  .sync{padding:26px 24px;display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;}
+  .node{border:1px solid var(--line2);border-radius:10px;padding:14px 18px;text-align:center;background:rgba(9,14,32,.6);}
+  .node .big{font-size:26px;margin-bottom:6px;filter:drop-shadow(0 0 8px rgba(248,243,170,.4));}
+  .node b{font-size:12.5px;letter-spacing:.1em;font-weight:400;display:block;}
+  .node span{font-size:10px;color:var(--ink-faint);display:block;margin-top:3px;}
+  .node.cloud{border-style:double;border-width:3px;padding:18px 26px;box-shadow:0 0 24px rgba(248,243,170,.12);}
+  .link-line{color:var(--ink-faint);font-size:12px;text-align:center;line-height:1.6;}
+  .link-line b{color:var(--ink);font-weight:400;font-size:14px;text-shadow:var(--glow);display:block;}
+
+  .foot{margin-top:80px;text-align:center;color:var(--ink-faint);font-size:11px;letter-spacing:.3em;}
+
+  @media (max-width:860px){
+    .trvl{grid-template-columns:1fr;}
+    .months{grid-template-columns:repeat(2,1fr);}
+    .hero h1{font-size:30px;}
+    .laptop{min-width:0;}
+  }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="vignette"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- 韩国国旗 -->
+    <symbol id="fkr" viewBox="0 0 30 20">
+      <rect width="30" height="20" fill="#f5f5f0"/>
+      <g transform="translate(15,10)">
+        <path d="M -5 0 A 5 5 0 0 1 5 0 A 2.5 2.5 0 0 1 0 0 A 2.5 2.5 0 0 0 -5 0 Z" fill="#c22"/>
+        <path d="M 5 0 A 5 5 0 0 1 -5 0 A 2.5 2.5 0 0 0 0 0 A 2.5 2.5 0 0 1 5 0 Z" fill="#036"/>
+      </g>
+      <g stroke="#222" stroke-width="1.1">
+        <path d="M4 4.2 l3.4 -2.3 M4.7 5.2 l3.4 -2.3 M5.4 6.2 l3.4 -2.3"/>
+        <path d="M22.6 1.9 l3.4 2.3 M21.9 2.9 l3.4 2.3 M21.2 3.9 l3.4 2.3"/>
+        <path d="M4 15.8 l3.4 2.3 M4.7 14.8 l3.4 2.3 M5.4 13.8 l3.4 2.3"/>
+        <path d="M22.6 18.1 l3.4 -2.3 M21.9 17.1 l3.4 -2.3 M21.2 16.1 l3.4 -2.3"/>
+      </g>
+    </symbol>
+    <!-- 美国国旗 -->
+    <symbol id="fus" viewBox="0 0 30 20">
+      <rect width="30" height="20" fill="#f5f5f0"/>
+      <g fill="#b22">
+        <rect y="0" width="30" height="2.2"/><rect y="4.45" width="30" height="2.2"/>
+        <rect y="8.9" width="30" height="2.2"/><rect y="13.35" width="30" height="2.2"/>
+        <rect y="17.8" width="30" height="2.2"/>
+      </g>
+      <rect width="13" height="11.1" fill="#224"/>
+      <g fill="#fff">
+        <circle cx="2.4" cy="2.2" r=".75"/><circle cx="6.5" cy="2.2" r=".75"/><circle cx="10.6" cy="2.2" r=".75"/>
+        <circle cx="4.4" cy="5.5" r=".75"/><circle cx="8.5" cy="5.5" r=".75"/>
+        <circle cx="2.4" cy="8.8" r=".75"/><circle cx="6.5" cy="8.8" r=".75"/><circle cx="10.6" cy="8.8" r=".75"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="deco">· Design Preview · Version 2 ·</div>
+    <h1>VINTAGE TO DO LIST</h1>
+    <div class="sub">四项优化 + 双端界面 + 数据同步方案</div>
+    <hr class="rule">
+  </div>
+
+  <!-- ① 二级结构 -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">01</span><h2>🗝️ 待办类模块 · 二级结构<span class="tag new">✦ 新</span><span class="tag">Private Info / AI skill / Movie / Book 通用</span></h2></div>
+    <p class="sec-desc">进入模块后先看到「待完成内容列表」（每条显示图片数量角标，不显示缩略图，界面更干净）→ 点击具体条目进入「条目详情页」，才展示缩略图墙、图片上传与备注。模块顶部新增「网址收藏」标签页。</p>
+
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>STEP 1 · 模块首页 = 任务列表 + 网址收藏 TAB</span></div>
+      <div class="tabs"><div class="tab on">📋 待办列表</div><div class="tab">🔗 网址收藏</div></div>
+      <div class="todo-box">
+        <div class="todo-add"><div class="inp">✎ 添加新条目…</div><div class="btn">＋ 添加</div></div>
+        <div class="titem"><span class="cb"></span><span class="txt">Prompt 工程：结构化提示词模板</span><span class="badge">🖼 ×3</span><span class="arrow">›</span><span class="del">✕</span></div>
+        <div class="titem"><span class="cb"></span><span class="txt">用 AI 做周报自动化</span><span class="badge">🖼 ×1</span><span class="arrow">›</span><span class="del">✕</span></div>
+        <div class="titem finished"><span class="cb done">✓</span><span class="txt">AI 生图关键词入门</span><span class="badge">🖼 ×2</span><span class="arrow">›</span><span class="del">✕</span></div>
+        <div class="hint">▸ 列表页只显示图片数量角标，点击条目 › 进入详情页</div>
+      </div>
+    </div>
+    <div class="gap"></div>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>STEP 2 · 条目详情页 = 缩略图墙 + 上传 + 备注</span></div>
+      <div class="detail">
+        <div class="crumb">AI SKILL / 待办列表 / <b>Prompt 工程：结构化提示词模板</b> &nbsp;&nbsp;‹ 返回</div>
+        <h4>▸ Prompt 工程：结构化提示词模板</h4>
+        <div class="gallery">
+          <div class="thumb">🖼️<span class="zoom">⤢</span></div>
+          <div class="thumb">🖼️<span class="zoom">⤢</span></div>
+          <div class="thumb">🖼️<span class="zoom">⤢</span></div>
+          <div class="thumb add">＋<span>上传图片</span></div>
+        </div>
+        <div class="memo">✎ 备注：CO-STAR 框架截图已存，周末整理成自己的模板…</div>
+      </div>
+    </div>
+    <div class="gap"></div>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>网址收藏 TAB · 粘贴即存 · 一键跳转</span></div>
+      <div class="tabs"><div class="tab">📋 待办列表</div><div class="tab on">🔗 网址收藏</div></div>
+      <div class="links">
+        <div class="todo-add"><div class="inp">🔗 粘贴网址，自动识别标题…</div><div class="btn">＋ 收藏</div></div>
+        <div class="lk"><div class="fav">📄</div><div class="lt"><b>Prompt Engineering Guide</b><span>https://www.promptingguide.ai/zh</span></div><span class="go">跳转 ↗</span></div>
+        <div class="lk"><div class="fav">🎬</div><div class="lt"><b>吴恩达 · ChatGPT Prompt 课程</b><span>https://learn.deeplearning.ai/chatgpt-prompt-eng</span></div><span class="go">跳转 ↗</span></div>
+        <div class="lk"><div class="fav">📚</div><div class="lt"><b>OpenAI 官方最佳实践</b><span>https://platform.openai.com/docs/guides/prompt-engineering</span></div><span class="go">跳转 ↗</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 语言模块 -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">02</span>
+      <h2><svg class="flag"><use href="#fkr"/></svg> Korea &nbsp;/&nbsp; <svg class="flag"><use href="#fus"/></svg> USA Language<span class="tag new">✦ 国旗图标 + 新日历视图</span></h2></div>
+    <p class="sec-desc">侧边栏图标替换为真实国旗（SVG 绘制，任何设备都能正常显示）。日历改为两层：首页显示「月份缩略卡」（每月一张迷你热力图 + 打卡率）→ 点击月份进入「周条形视图」，一行一周、7 格一天，✓ 为已打卡 → 点击某天进入原有 5 大学习模块。</p>
+
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>STEP 1 · 月份缩略视图（年度总览）</span></div>
+      <div class="months">
+        <div class="mcard"><b>APR</b><div class="mini"><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i></i><i class="h"></i></div><div class="pct">打卡 17/30 · 57%</div></div>
+        <div class="mcard"><b>MAY</b><div class="mini"><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i></div><div class="pct">打卡 19/31 · 61%</div></div>
+        <div class="mcard"><b>JUN</b><div class="mini"><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i></div><div class="pct">打卡 21/30 · 70%</div></div>
+        <div class="mcard on"><b>JUL ◂ 当前</b><div class="mini"><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i></div><div class="pct">打卡 23/29 · 79% ↑</div></div>
+      </div>
+      <div class="hint" style="padding:0 24px 18px;">▸ 每张月卡 = 迷你打卡热力图 + 当月打卡率，点击月份卡进入下方周条形视图</div>
+    </div>
+    <div class="gap"></div>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>STEP 2 · 周条形视图（JULY 2026）· 点击某天 → 5 大学习模块</span></div>
+      <div class="weeks">
+        <div class="wrow"><span class="wl">WEEK 1 · 1-5</span><div class="wbar"><i class="h">1</i><i class="h">2</i><i class="h">3</i><i class="h">4</i><i>5</i><i style="opacity:.25"></i><i style="opacity:.25"></i></div><span class="wp">4/5</span></div>
+        <div class="wrow"><span class="wl">WEEK 2 · 6-12</span><div class="wbar"><i class="h">6</i><i class="h">7</i><i>8</i><i class="h">9</i><i class="h">10</i><i class="h">11</i><i class="h">12</i></div><span class="wp">6/7</span></div>
+        <div class="wrow"><span class="wl">WEEK 3 · 13-19</span><div class="wbar"><i class="h">13</i><i class="h">14</i><i class="h">15</i><i>16</i><i class="h">17</i><i class="h">18</i><i class="h">19</i></div><span class="wp">6/7</span></div>
+        <div class="wrow"><span class="wl">WEEK 4 · 20-26</span><div class="wbar"><i class="h">20</i><i class="h">21</i><i>22</i><i class="h">23</i><i class="h">24</i><i>25</i><i class="h">26</i></div><span class="wp">5/7</span></div>
+        <div class="wrow"><span class="wl">WEEK 5 · 27-31</span><div class="wbar"><i class="h">27</i><i class="h">28</i><i class="h today">29</i><i>30</i><i>31</i><i style="opacity:.25"></i><i style="opacity:.25"></i></div><span class="wp">3/5</span></div>
+        <div class="hint">▸ 一行 = 一周，右侧为该周打卡率；点击任意日期格 → 进入 단어/대화/문장/낭독/정리（或 Words/Dialogue/…）5 大模块（同 V1 设计）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ EUR trvl -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">03</span><h2>🗺️ EUR trvl<span class="tag new">✦ 内嵌地图 + 行李清单</span></h2></div>
+    <p class="sec-desc">地图不再跳出 APP：通过高德地图 JS API（免费 Web Key）把地图直接嵌入页面内，支持缩放、拖动、行程点位与路线；点位保留「在高德 APP 中打开」按钮做导航兜底。右侧新增「行李清单」子模块，逐项打钩并显示整备进度。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>EUR TRVL · EMBEDDED MAP + PLAN + LUGGAGE</span></div>
+      <div class="trvl">
+        <div class="map-embed">
+          <div class="chrome">🧭<span class="url">amap.com · JS API 内嵌 · 无需跳转</span><span class="btn small">导航兜底 ↗</span></div>
+          <div class="map-grid"></div>
+          <hr class="route">
+          <span class="pin" style="left:16%;top:34%;">📍</span>
+          <span class="pin" style="left:46%;top:48%;">📍</span>
+          <span class="pin" style="left:74%;top:64%;">📍</span>
+          <div class="map-ctl"><b>＋</b><b>－</b><b>◎</b></div>
+          <div class="map-label"><span>巴黎 → 苏黎世 → 罗马 · 3 点位已标记</span><span>比例尺 ─ 100km</span></div>
+        </div>
+        <div class="side-stack">
+          <div class="plan-card">
+            <h5>▸ PLAN · 行程计划</h5>
+            <div class="plan-it"><b>D1-3</b><span>巴黎：卢浮宫 / 塞纳河</span></div>
+            <div class="plan-it"><b>D4-5</b><span>苏黎世：老城区 / 雪山</span></div>
+            <div class="plan-it"><b>D6-8</b><span>罗马：斗兽场 / 梵蒂冈</span></div>
+          </div>
+          <div class="plan-card">
+            <h5>▸ LUGGAGE · 行李清单 <span class="tag new" style="margin-left:6px;">✦ 新</span></h5>
+            <div class="lug ok"><span class="cb done">✓</span>护照 + 申根签证复印件</div>
+            <div class="lug ok"><span class="cb done">✓</span>欧标转换插头 ×2</div>
+            <div class="lug"><span class="cb"></span>欧元现金 + 双币卡</div>
+            <div class="lug"><span class="cb"></span>常备药品 / 肠胃药</div>
+            <div class="lug ok"><span class="cb done">✓</span>轻便雨伞 + 折叠背包</div>
+            <div class="prog"><i></i></div>
+            <div class="hint" style="margin-top:6px;">整备进度 62% · 剩 3 项未备</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 双端 -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">04</span><h2>💻📱 跨平台双端界面<span class="tag new">✦ 新</span></h2></div>
+    <p class="sec-desc">同一套数据、两套响应式界面：电脑端保留「侧边栏 + 主区」的桌面布局；手机端自动切换为「卡片流 + 底部导航栏」，常用 5 项进底栏，其余收进「更多」。侧边栏语言项已换成国旗图标。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>DESKTOP & MOBILE · RESPONSIVE</span></div>
+      <div class="devices">
+        <div class="laptop">
+          <div class="screen">
+            <div class="mini-layout">
+              <div class="mini-side">
+                <div class="lg"><b>VINTAGE</b></div>
+                <a class="on">🎓 Study Project</a>
+                <a>🗝️ Private Info</a>
+                <a>💼 Job Content</a>
+                <a>🤖 AI skill</a>
+                <a>🗺️ EUR trvl</a>
+                <a><svg class="flag"><use href="#fkr"/></svg> Korea language</a>
+                <a><svg class="flag"><use href="#fus"/></svg> USA language</a>
+                <a>🎬 Movie</a>
+                <a>📖 Book</a>
+                <a>📜 時政金融筆記</a>
+              </div>
+              <div class="mini-main">
+                <h6>Study Project</h6>
+                <div class="dt">WEDNESDAY · JULY 29</div>
+                <div class="mini-stat">
+                  <div><b>6</b><span>进行中</span></div>
+                  <div><b>14</b><span>已完成</span></div>
+                  <div><b>3h25m</b><span>今日专注</span></div>
+                </div>
+                <div class="mini-item"><span class="cb"></span>整理线性代数错题本</div>
+                <div class="mini-item"><span class="cb done">✓</span>完成 Python 爬虫小项目</div>
+                <div class="mini-item"><span class="cb"></span>阅读论文并做摘要</div>
+              </div>
+            </div>
+          </div>
+          <div class="base"></div>
+          <div class="hint" style="text-align:center;">电脑端 · 侧边栏布局</div>
+        </div>
+        <div>
+          <div class="phone">
+            <div class="notch"><i></i></div>
+            <div class="ph-head"><b>VINTAGE</b><span>TO DO LIST</span></div>
+            <div class="ph-body">
+              <div class="ph-card"><span class="ic">🎓</span><b>Study Project</b><span>6 项 · 🍅3h25m</span></div>
+              <div class="ph-card"><span class="ic">💼</span><b>Job Content</b><span>本周 3 待办</span></div>
+              <div class="ph-card"><span class="ic"><svg class="flag" style="width:18px;height:12px;"><use href="#fkr"/></svg></span><b>Korea language</b><span>今日已打卡 ✓</span></div>
+              <div class="ph-card"><span class="ic"><svg class="flag" style="width:18px;height:12px;"><use href="#fus"/></svg></span><b>USA language</b><span>待打卡</span></div>
+              <div class="ph-card"><span class="ic">🗺️</span><b>EUR trvl</b><span>行李 62%</span></div>
+            </div>
+            <div class="ph-nav">
+              <div class="on">🏠<span>首页</span></div>
+              <div>📋<span>清单</span></div>
+              <div>🍅<span>专注</span></div>
+              <div>📜<span>笔记</span></div>
+              <div>⋯<span>更多</span></div>
+            </div>
+          </div>
+          <div class="hint" style="text-align:center;">手机端 · 卡片流 + 底部导航</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 同步 -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">05</span><h2>☁️ 多设备实时同步方案<span class="tag new">✦ 新</span></h2></div>
+    <p class="sec-desc">推荐「同步码」方案（免注册登录，体验最轻）：首次使用生成一个专属同步码，手机 / 电脑输入同一个码即自动绑定；任何一端的增删改实时推送到云端，其他设备秒级更新，离线修改联网后自动合并。也可升级为完整账号密码登录，见下方说明。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>SYNC · 同步码方案示意</span></div>
+      <div class="sync">
+        <div class="node"><div class="big">💻</div><b>电脑端</b><span>浏览器 / 桌面</span></div>
+        <div class="link-line">⇄<b>实时推送</b>WebSocket / 轮询</div>
+        <div class="node cloud"><div class="big">☁️</div><b>云端数据仓</b><span>同步码：VNTG-7X2K-STAR</span><span>加密存储 · 自动合并冲突</span></div>
+        <div class="link-line">⇄<b>实时推送</b>秒级更新</div>
+        <div class="node"><div class="big">📱</div><b>手机端</b><span>添加到主屏幕 = APP</span></div>
+      </div>
+      <div class="hint" style="padding:0 26px 20px;">▸ 同步码 = 你的钥匙，换新设备只需输码即可恢复全部数据 ▸ 未联网时数据保存在本地，联网后自动补同步</div>
+    </div>
+  </div>
+
+  <div class="foot">✦ VINTAGE TO DO LIST · V2 PREVIEW · CONFIRM TO BUILD ✦</div>
+</div>
+
+<script>
+const cv=document.getElementById('stars'),ctx=cv.getContext('2d');
+let W,H,stars=[];
+function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;make();}
+function make(){
+  stars=[];
+  const n=Math.floor(W*H/2600);
+  for(let i=0;i<n;i++){
+    stars.push({x:Math.random()*W,y:Math.random()*H,
+      r:Math.random()<.85?Math.random()*1.1+.2:Math.random()*1.8+.8,
+      a:Math.random()*.7+.15,tw:Math.random()*.02+.004,
+      ph:Math.random()*Math.PI*2,warm:Math.random()<.28});
+  }
+}
+function nebula(){
+  const blobs=[[.2,.25,260,'90,110,200'],[.78,.6,300,'70,90,170'],[.5,.85,220,'150,140,120'],[.9,.15,180,'110,100,180']];
+  blobs.forEach(([px,py,r,c])=>{
+    const g=ctx.createRadialGradient(px*W,py*H,0,px*W,py*H,r);
+    g.addColorStop(0,`rgba(${c},0.10)`);g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  });
+}
+let t=0;
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#0a1024');bg.addColorStop(.5,'#070b18');bg.addColorStop(1,'#05070f');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  nebula();t+=1;
+  for(const s of stars){
+    const tw=s.a*(0.6+0.4*Math.sin(t*s.tw+s.ph));
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);
+    ctx.fillStyle=s.warm?`rgba(248,243,170,${tw})`:`rgba(220,230,255,${tw})`;ctx.fill();
+    if(s.r>1.4){
+      ctx.strokeStyle=`rgba(248,243,170,${tw*.4})`;ctx.lineWidth=.6;
+      ctx.beginPath();
+      ctx.moveTo(s.x-s.r*3,s.y);ctx.lineTo(s.x+s.r*3,s.y);
+      ctx.moveTo(s.x,s.y-s.r*3);ctx.lineTo(s.x,s.y+s.r*3);
+      ctx.stroke();
+    }
+  }
+  requestAnimationFrame(draw);
+}
+addEventListener('resize',resize);resize();draw();
+</script>
+</body>
+</html>

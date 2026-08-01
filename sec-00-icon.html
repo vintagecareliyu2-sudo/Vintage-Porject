@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>00 · APP 图标 — VINTAGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:linear-gradient(135deg,#070B14 0%,#111B2D 100%);
+  min-height:100vh;font-family:-apple-system,'Segoe UI',sans-serif;
+  color:rgba(255,255,255,0.85);display:flex;flex-direction:column;align-items:center;padding:40px 20px;
+  position:relative;
+}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 30% 20%,rgba(100,150,230,0.04) 0%,transparent 50%);pointer-events:none}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:24px;
+  padding:16px 32px;background:rgba(7,11,20,0.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.06);width:100%;max-width:900px;border-radius:0 0 16px 16px;margin-bottom:40px}
+.back{color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;transition:.2s}
+.back:hover{color:#6496E6}
+.title{font-family:'Pinyon Script',cursive;font-size:28px;
+  background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;
+  text-shadow:0 0 25px rgba(212,175,55,0.12);filter:brightness(1.1)}
+.badge{font-size:10px;color:rgba(100,150,230,0.6);border:1px solid rgba(100,150,230,0.2);padding:3px 10px;border-radius:20px;letter-spacing:1px}
+.icons{display:flex;gap:48px;flex-wrap:wrap;justify-content:center;max-width:900px;width:100%}
+.icon-card{text-align:center;width:220px;padding:36px 24px;
+  background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:20px;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.icon-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.15);
+  box-shadow:0 12px 40px rgba(0,0,0,0.2)}
+.icon-card.selected{border-color:rgba(100,150,230,0.35);
+  box-shadow:0 0 30px rgba(100,150,230,0.1),0 12px 40px rgba(0,0,0,0.2);
+  background:rgba(100,150,230,0.03)}
+.preview{width:120px;height:120px;margin:0 auto 20px;border-radius:28px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden}
+/* Icon A - Deep Space Blue (SELECTED) */
+.icon-a .preview{background:radial-gradient(circle at 30% 25%,#1a2a4a 0%,#0a1020 60%,#050810 100%)}
+.icon-a .planet{width:58px;height:58px;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,0.5) 0%,#2a3a5a 40%,#152035 100%);
+  box-shadow:0 0 20px rgba(80,120,200,0.3),inset -3px -3px 12px rgba(0,0,0,0.6),inset 3px 3px 8px rgba(255,255,255,0.15);
+  position:absolute}
+.icon-a .ring{width:90px;height:26px;border:2px solid rgba(100,150,230,0.5);border-radius:50%;
+  position:absolute;transform:rotate(-18deg);
+  box-shadow:0 0 8px rgba(100,150,230,0.3),0 0 20px rgba(100,150,230,0.15)}
+/* Icon B - Meteorite Gray */
+.icon-b .preview{background:radial-gradient(circle at 30% 25%,#3a3a42 0%,#1a1a22 60%,#0c0c10 100%)}
+.icon-b .planet{width:58px;height:58px;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,0.35) 0%,#5a5a62 40%,#2a2a32 100%);
+  box-shadow:0 0 15px rgba(180,180,190,0.2),inset -3px -3px 12px rgba(0,0,0,0.65),inset 3px 3px 8px rgba(255,255,255,0.12);
+  position:absolute}
+.icon-b .ring{width:88px;height:24px;border:2px solid rgba(200,200,210,0.35);border-radius:50%;
+  position:absolute;transform:rotate(-18deg);
+  box-shadow:0 0 6px rgba(200,200,210,0.2)}
+/* Icon C - Amber Gold */
+.icon-c .preview{background:radial-gradient(circle at 30% 25%,#2a2010 0%,#141008 60%,#0a0804 100%)}
+.icon-c .planet{width:58px;height:58px;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#FFF8E1 0%,#D4AF37 45%,#8B6914 100%);
+  box-shadow:0 0 25px rgba(212,175,55,0.45),0 0 50px rgba(212,175,55,0.2),
+  inset -3px -3px 14px rgba(0,0,0,0.5),inset 3px 3px 8px rgba(255,255,255,0.3);
+  position:absolute}
+.icon-c .ring{width:92px;height:26px;border:2.5px solid rgba(212,175,55,0.6);border-radius:50%;
+  position:absolute;transform:rotate(-18deg);
+  box-shadow:0 0 10px rgba(212,175,55,0.4),0 0 30px rgba(212,175,55,0.2)}
+.sizes{display:flex;justify-content:center;gap:16px;margin-top:16px}
+.sz{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.3)}
+.sz .p{width:22px;height:22px;border-radius:50%;background:inherit;box-shadow:inherit}
+.sz .r{position:absolute;width:34px;height:10px;border-radius:50%;border:1.5px solid inherit}
+h4{font-size:14px;font-weight:500;margin-bottom:4px;color:rgba(255,255,255,0.9)}
+.tag{font-size:11px;color:rgba(100,150,230,0.7);margin-bottom:8px}
+.tag-gold{color:rgba(212,175,55,0.7)}
+.desc{font-size:11px;color:rgba(255,255,255,0.33);line-height:1.6}
+.selected h4::after{content:' ✓';color:#6496E6;font-size:13px;font-weight:bold;margin-left:4px}
+.nav{text-align:center;margin-top:48px}
+.nav a{color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px;margin:0 16px;transition:.2s}
+.nav a:hover{color:#D4AF37}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="back" href="index.html">← Hub</a>
+  <div class="title">Vintage</div>
+  <span class="badge">00 · 图标</span>
+</div>
+
+<div class="icons">
+  <!-- Deep Space Blue (SELECTED) -->
+  <div class="icon-card icon-a selected">
+    <div class="preview"><div class="planet"></div><div class="ring"></div></div>
+    <div class="sizes">
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#2a3a5a 0%,#152035 100%)"></div></div>
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#2a3a5a 0%,#152035 100%);width:16px;height:16px"></div></div>
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#2a3a5a 0%,#152035 100%);width:10px;height:10px"></div></div>
+    </div>
+    <h4>深空蓝 Deep Space Blue</h4>
+    <div class="tag">96px · 44px · 26px · 已选用</div>
+    <div class="desc">冷静科技感<br>蓝紫色星环光晕 · 小尺寸辨识度高</div>
+  </div>
+
+  <!-- Meteorite Gray -->
+  <div class="icon-card icon-b">
+    <div class="preview"><div class="planet"></div><div class="ring"></div></div>
+    <div class="sizes">
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#5a5a62 0%,#2a2a32 100%)"></div></div>
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#5a5a62 0%,#2a2a32 100%);width:16px;height:16px"></div></div>
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#5a5a62 0%,#2a2a32 100%);width:10px;height:10px"></div></div>
+    </div>
+    <h4>陨石灰 Meteorite Gray</h4>
+    <div class="tag tag-gold">96px · 44px · 26px</div>
+    <div class="desc">沉稳质感<br>银灰金属调星环</div>
+  </div>
+
+  <!-- Amber Gold -->
+  <div class="icon-card icon-c">
+    <div class="preview"><div class="planet"></div><div class="ring"></div></div>
+    <div class="sizes">
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#D4AF37 0%,#8B6914 100%)"></div></div>
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#D4AF37 0%,#8B6914 100%);width:16px;height:16px"></div></div>
+      <div class="sz"><div class="p" style="background:radial-gradient(circle at 30% 25%,#D4AF37 0%,#8B6914 100%);width:10px;height:10px"></div></div>
+    </div>
+    <h4>琥珀金 Amber Gold Ring</h4>
+    <div class="tag tag-gold">96px · 44px · 26px</div>
+    <div class="desc">温暖发光感<br>金色高光环 · 备选方案</div>
+  </div>
+</div>
+
+<div class="nav">
+  <a href="sec-01-desktop.html">桌面端 →</a>
+  <a href="index.html">返回 Hub</a>
+</div>
+
+</body>
+</html>

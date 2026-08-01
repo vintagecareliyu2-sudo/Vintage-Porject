@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 · 交互微动效 — VINTAGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:linear-gradient(135deg,#070B14 0%,#111B2D 100%);
+  min-height:100vh;font-family:-apple-system,'Segoe UI',sans-serif;
+  color:rgba(255,255,255,0.85);padding:20px;position:relative;
+}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(100,150,230,0.04) 0%,transparent 50%);pointer-events:none}
+
+.top{display:flex;align-items:center;gap:24px;padding:12px 28px;margin-bottom:24px;
+  background:rgba(7,11,20,0.8);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;max-width:900px;width:100%;margin-left:auto;margin-right:auto}
+.back{color:rgba(255,255,255,0.5);text-decoration:none;font-size:12px;transition:.2s}
+.back:hover{color:#6496E6}
+.title{font-family:'Pinyon Script',cursive;font-size:26px;
+  background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;
+  text-shadow:0 0 20px rgba(212,175,55,0.1);filter:brightness(1.1)}
+.badge{font-size:10px;color:rgba(100,150,230,0.6);border:1px solid rgba(100,150,230,0.2);padding:2px 8px;border-radius:20px}
+
+.grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+.demo-card{padding:24px;border-radius:16px;
+  background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.demo-card:hover{transform:translateY(-2px)}
+.demo-card h3{font-size:13px;font-weight:500;margin-bottom:4px;color:rgba(255,255,255,0.9)}
+.demo-card p{font-size:11px;color:rgba(255,255,255,0.33);margin-bottom:16px;line-height:1.6}
+
+.particle-row{display:flex;align-items:center;gap:12px;padding:12px;
+  border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
+  cursor:pointer;position:relative;overflow:hidden;user-select:none;-webkit-tap-highlight-color:transparent}
+.p-chk{width:22px;height:22px;border-radius:50%;border:2px solid rgba(212,175,55,0.35);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .3s;font-size:11px;color:transparent}
+.p-chk.checked{background:rgba(212,175,55,0.25);color:#D4AF37;border-color:#D4AF37}
+.p-txt{font-size:12.5px;color:rgba(255,255,255,0.68)}
+.p-hint{margin-top:10px;font-size:10px;color:rgba(100,150,230,0.5)}
+
+.particle{position:absolute;width:5px;height:5px;border-radius:50%;
+  pointer-events:none;z-index:10}
+.p-gold{background:linear-gradient(135deg,#FCEABB,#D4AF37);box-shadow:0 0 6px rgba(212,175,55,0.6)}
+.p-blue{background:linear-gradient(135deg,#a8c0ff,#6496E6);box-shadow:0 0 6px rgba(100,150,230,0.6)}
+
+@keyframes p-burst{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}
+}
+
+.elastic-btn{padding:14px 32px;border-radius:12px;border:none;cursor:pointer;
+  font-family:inherit;font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;
+  color:#0a0a0a;background:linear-gradient(135deg,#F3A183,#D4AF37);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.elastic-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(212,175,55,0.25)}
+.elastic-btn:active{transform:scale(0.96)}
+
+.orbit-demo{display:flex;align-items:center;gap:16px;padding:16px;
+  border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)}
+.orbit-wrap{position:relative;width:60px;height:60px;cursor:pointer}
+.orbit-wrap svg{width:60px;height:60px;transform:rotate(-90deg)}
+.orbit-pct{text-align:center}
+.orbit-val{font-size:24px;font-weight:300;color:rgba(255,255,255,0.95)}
+.orbit-lbl{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px}
+.orbit-hint{margin-top:10px;font-size:10px;color:rgba(100,150,230,0.5)}
+
+.count-wrap{padding:16px;border-radius:12px;background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);text-align:center}
+.count-val{font-size:36px;font-weight:200;color:rgba(255,255,255,0.95);
+  font-variant-numeric:tabular-nums}
+.count-lbl{font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+
+.sweep-card{padding:20px;border-radius:16px;
+  background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);cursor:pointer;
+  position:relative;overflow:hidden;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.sweep-card:active{transform:scale(0.97)}
+.sweep-card::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(100,150,230,0.08),transparent);
+  transition:left .5s ease}
+.sweep-card.swept::after{left:150%}
+
+.nav{text-align:center;margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)}
+.nav a{color:rgba(255,255,255,0.38);text-decoration:none;font-size:12px;margin:0 14px;transition:.2s}
+.nav a:hover{color:#D4AF37}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="back" href="index.html">← Hub</a>
+  <div class="title">Vintage</div>
+  <span class="badge">04 · 交互动效</span>
+</div>
+
+<div class="grid">
+
+  <!-- 1. Particle Burst -->
+  <div class="demo-card">
+    <h3>✨ 打钩粒子喷溅</h3>
+    <p>点击复选框触发金色/蓝色粒子爆炸（0.5秒消散）</p>
+
+    <div class="particle-row" onclick="burst(this,event)">
+      <div class="p-chk">✓</div>
+      <div class="p-txt">完成韩语词汇 Unit 30 学习</div>
+    </div>
+    <div class="particle-row" onclick="burst(this,event)">
+      <div class="p-chk">✓</div>
+      <div class="p-txt">复习 React Hooks 文档</div>
+    </div>
+    <div class="particle-row" onclick="burst(this,event)">
+      <div class="p-chk">✓</div>
+      <div class="p-txt">打包巴黎旅行第一天必备物品</div>
+    </div>
+    <div class="p-hint">↑ 点击任意行切换勾选 + 粒子爆发特效</div>
+  </div>
+
+  <!-- 2. Elastic Button -->
+  <div class="demo-card">
+    <h3>🎯 弹性按压回弹</h3>
+    <p>按钮按下带弹簧回弹动画（cubic-bezier 弹性曲线）</p>
+    <div style="text-align:center;padding:20px 0">
+      <button class="elastic-btn" onclick="this.style.transform='scale(0.96)';setTimeout(()=>this.style.transform='',150)">ENTER STARPORT</button>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <button class="elastic-btn" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.1)"
+        onclick="this.style.transform='scale(0.96)';setTimeout(()=>this.style.transform='',150)">添加新任务</button>
+    </div>
+  </div>
+
+  <!-- 3. Orbit Ring -->
+  <div class="demo-card">
+    <h3>🪐 轨道进度环</h3>
+    <p>点击进度环增加进度 + 卫星位置推进</p>
+    <div class="orbit-demo">
+      <div class="orbit-wrap" onclick="addProgress(this)">
+        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/><circle id="prog1" cx="30" cy="30" r="25" fill="none" stroke="#6496E6" stroke-width="3" stroke-dasharray="62 157" stroke-linecap="round"/></svg>
+      </div>
+      <div class="orbit-pct">
+        <div class="orbit-val" id="val1">40%</div>
+        <div class="orbit-lbl">本周目标</div>
+      </div>
+    </div>
+    <div class="orbit-demo" style="margin-top:12px">
+      <div class="orbit-wrap" onclick="addProgress(this)">
+        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/><circle id="prog2" cx="30" cy="30" r="25" fill="none" stroke="#D4AF37" stroke-width="3" stroke-dasharray="113 157" stroke-linecap="round"/></svg>
+      </div>
+      <div class="orbit-pct">
+        <div class="orbit-val" id="val2">72%</div>
+        <div class="orbit-lbl">专注时长</div>
+      </div>
+    </div>
+    <div class="orbit-hint">↑ 点击任意轨道环 +10%</div>
+  </div>
+
+  <!-- 4. Count-Up -->
+  <div class="demo-card">
+    <h3>🔢 数字滚动递增</h3>
+    <p>页面加载时数字从 0 滚动到目标值（无生硬跳变）</p>
+    <div style="display:flex;gap:16px">
+      <div class="count-wrap">
+        <div class="count-val" data-target="205">0</div>
+        <div class="count-lbl">专注分钟数</div>
+      </div>
+      <div class="count-wrap">
+        <div class="count-val" data-target="12">0</div>
+        <div class="count-lbl">完成任务</div>
+      </div>
+      <div class="count-wrap">
+        <div class="count-val" data-target="87">0</div>
+        <div class="count-lbl">连续打卡天数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Golden Sweep -->
+  <div class="demo-card" style="grid-column:1/-1">
+    <h3>💫 完成扫光效果</h3>
+    <p>点击卡片触发蓝色光扫过表面（深空蓝主题色）</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div class="sweep-card" onclick="sweep(this)">
+        <div style="font-size:12px;font-weight:500;margin-bottom:4px">学习项目</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.38)">已完成 3 / 5 项任务</div>
+      </div>
+      <div class="sweep-card" onclick="sweep(this)">
+        <div style="font-size:12px;font-weight:500;margin-bottom:4px">韩语打卡</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.38)">连续打卡 23 / 30 天</div>
+      </div>
+      <div class="sweep-card" onclick="sweep(this)">
+        <div style="font-size:12px;font-weight:500;margin-bottom:4px">第32周工作</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.38)">完成度 85%</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <a href="sec-06-fonts.html">← 字体方案</a>
+  <a href="sec-05-spec.html">CSS 规范 →</a>
+  <a href="index.html">Hub</a>
+</div>
+
+<script>
+function burst(row,e){
+  const chk=row.querySelector('.p-chk');
+  chk.classList.toggle('checked');
+  if(chk.classList.contains('checked')){
+    createParticles(row,e.clientX,e.clientY);
+  }
+}
+function createParticles(el,x,y){
+  const rect=el.getBoundingClientRect();
+  const cx=x-rect.left,cy=y-rect.top;
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');
+    p.className='particle '+(i%2===0?'p-gold':'p-blue');
+    const angle=(Math.PI*2/10)*i;
+    const dist=30+Math.random()*40;
+    p.style.setProperty('--tx',Math.cos(angle)*dist+'px');
+    p.style.setProperty('--ty',Math.sin(angle)*dist+'px');
+    p.style.left=(cx-2)+'px';p.style.top=(cy-2)+'px';
+    p.style.animation='p-burst 0.5s ease-out forwards';
+    el.appendChild(p);
+    setTimeout(()=>p.remove(),500);
+  }
+}
+
+let pct1=40,pct2=72;
+function addProgress(el){
+  const isPct1=el.querySelector('#prog1');
+  if(isPct1){pct1=Math.min(pct1+10,100);document.getElementById('val1').textContent=pct1+'%';
+    isPct1.setAttribute('stroke-dasharray',(pct1/100)*157+' 157')}
+  else{pct2=Math.min(pct2+10,100);document.getElementById('val2').textContent=pct2+'%';
+    document.getElementById('prog2').setAttribute('stroke-dasharray',(pct2/100)*157+' 157')}
+}
+
+document.querySelectorAll('.count-val').forEach(el=>{
+  const target=+el.dataset.target;
+  let cur=0;const step=target/40;const timer=setInterval(()=>{
+    cur+=step;if(cur>=target){cur=target;clearInterval(timer)}
+    el.textContent=Math.round(cur);
+  },30);
+});
+
+function sweep(el){
+  el.classList.remove('swept');
+  void el.offsetWidth;
+  el.classList.add('swept');
+}
+</script>
+</body>
+</html>

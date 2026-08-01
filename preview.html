@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VINTAGE TO DO LIST · 设计预览</title>
+<style>
+  :root{
+    --bg:#070b18;
+    --bg2:#0b1226;
+    --panel:rgba(13,20,42,.72);
+    --panel2:rgba(18,27,56,.85);
+    --line:rgba(248,243,170,.22);
+    --line2:rgba(248,243,170,.45);
+    --ink:#f8f3aa;           /* 荧光淡黄 主 */
+    --ink-dim:#cfc98c;       /* 次级 */
+    --ink-faint:#9a955f;     /* 弱 */
+    --glow:0 0 8px rgba(248,243,170,.55),0 0 22px rgba(248,243,170,.18);
+    --done:#7f8b5a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Georgia","Times New Roman","Noto Serif SC","SimSun",serif;
+    overflow-x:hidden;
+  }
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 30%,transparent 40%,rgba(3,5,12,.75) 100%);}
+  .wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:40px 28px 90px;}
+
+  /* ============ 页头 ============ */
+  .hero{text-align:center;padding:44px 0 26px;}
+  .hero .deco{letter-spacing:.6em;font-size:12px;color:var(--ink-faint);text-transform:uppercase;}
+  .hero h1{
+    font-size:52px;letter-spacing:.18em;margin:14px 0 10px;font-weight:700;
+    text-shadow:var(--glow);
+  }
+  .hero .sub{color:var(--ink-dim);font-size:15px;letter-spacing:.25em;}
+  .hero .rule{width:280px;margin:22px auto 0;border:none;border-top:1px solid var(--line2);
+    position:relative;}
+  .hero .rule::after{content:"✦";position:absolute;left:50%;top:-11px;transform:translateX(-50%);
+    background:var(--bg);padding:0 12px;color:var(--ink);font-size:14px;}
+
+  /* ============ 章节标题 ============ */
+  .sec{margin-top:74px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+  .sec-head .no{font-size:30px;color:var(--ink-faint);font-style:italic;}
+  .sec-head h2{font-size:24px;letter-spacing:.12em;text-shadow:var(--glow);}
+  .sec-desc{color:var(--ink-dim);font-size:13.5px;line-height:1.9;margin-bottom:20px;max-width:820px;}
+
+  /* ============ 通用面板 ============ */
+  .frame{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:0 0 0 1px rgba(0,0,0,.4),0 18px 50px rgba(0,0,0,.55),inset 0 0 60px rgba(8,12,30,.6);
+    backdrop-filter:blur(3px);
+    overflow:hidden;
+  }
+  .frame .bar{
+    display:flex;align-items:center;gap:8px;padding:10px 16px;
+    border-bottom:1px solid var(--line);background:rgba(8,12,28,.6);
+  }
+  .frame .bar i{width:10px;height:10px;border-radius:50%;border:1px solid var(--line2);display:inline-block;}
+  .frame .bar span{margin-left:8px;font-size:11px;letter-spacing:.3em;color:var(--ink-faint);}
+
+  /* ============ 整体布局 mockup ============ */
+  .layout{display:flex;min-height:560px;}
+  .side{
+    width:250px;flex-shrink:0;border-right:1px solid var(--line);
+    padding:22px 0;background:rgba(6,10,24,.55);
+  }
+  .side .logo{padding:0 22px 18px;border-bottom:1px dashed var(--line);margin-bottom:14px;}
+  .side .logo b{font-size:16px;letter-spacing:.14em;text-shadow:var(--glow);display:block;}
+  .side .logo em{font-size:10px;color:var(--ink-faint);letter-spacing:.32em;font-style:normal;}
+  .nav a{
+    display:flex;align-items:center;gap:12px;padding:11px 22px;
+    color:var(--ink-dim);font-size:14px;letter-spacing:.06em;text-decoration:none;
+    border-left:3px solid transparent;transition:.2s;
+  }
+  .nav a .ic{width:22px;text-align:center;font-size:15px;filter:sepia(1) hue-rotate(10deg) saturate(3) brightness(1.1);}
+  .nav a:hover,.nav a.on{
+    color:var(--ink);background:linear-gradient(90deg,rgba(248,243,170,.08),transparent);
+    border-left-color:var(--ink);text-shadow:var(--glow);
+  }
+  .main{flex:1;padding:30px 34px;}
+  .main h3{font-size:26px;letter-spacing:.1em;text-shadow:var(--glow);}
+  .main .date{color:var(--ink-faint);font-size:12px;letter-spacing:.2em;margin:6px 0 22px;}
+  .stat-row{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+  .stat{
+    flex:1;min-width:130px;border:1px solid var(--line);border-radius:8px;padding:14px 16px;
+    background:rgba(10,16,36,.5);
+  }
+  .stat b{font-size:24px;display:block;text-shadow:var(--glow);}
+  .stat span{font-size:11px;color:var(--ink-faint);letter-spacing:.15em;}
+
+  /* ============ 待办清单样式（Study/Private/AI/Movie/Book 通用） ============ */
+  .todo-box{padding:22px 26px;}
+  .todo-add{
+    display:flex;gap:10px;margin-bottom:18px;
+  }
+  .todo-add .inp{
+    flex:1;border:1px dashed var(--line2);border-radius:6px;padding:10px 14px;
+    color:var(--ink-faint);font-size:13px;font-style:italic;background:rgba(8,12,28,.4);
+  }
+  .btn{
+    border:1px solid var(--line2);border-radius:6px;padding:10px 18px;font-size:13px;
+    color:var(--ink);letter-spacing:.1em;background:rgba(248,243,170,.06);
+    text-shadow:var(--glow);white-space:nowrap;cursor:default;
+  }
+  .btn.small{padding:5px 12px;font-size:11px;}
+  .titem{
+    display:flex;align-items:center;gap:14px;padding:13px 6px;
+    border-bottom:1px dashed var(--line);
+  }
+  .cb{width:18px;height:18px;border:1px solid var(--ink-dim);border-radius:4px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .cb.done{background:rgba(248,243,170,.12);border-color:var(--ink);color:var(--ink);}
+  .titem .txt{flex:1;font-size:14.5px;}
+  .titem.finished .txt{color:var(--done);text-decoration:line-through;}
+  .thumb{
+    width:44px;height:44px;border-radius:5px;border:1px solid var(--line2);flex-shrink:0;
+    background:
+      linear-gradient(135deg,rgba(248,243,170,.25),rgba(90,110,190,.35)),
+      repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 4px,transparent 4px 8px);
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+    position:relative;
+  }
+  .thumb::after{content:"×1";position:absolute;right:-6px;top:-6px;font-size:9px;
+    background:var(--bg2);border:1px solid var(--line2);border-radius:8px;padding:0 4px;color:var(--ink-dim);}
+  .del{color:var(--ink-faint);font-size:15px;}
+  .hint{margin-top:14px;font-size:11.5px;color:var(--ink-faint);letter-spacing:.05em;line-height:1.8;}
+
+  /* ============ 番茄钟详情 ============ */
+  .pomo{display:flex;gap:26px;padding:26px;flex-wrap:wrap;}
+  .pomo-clock{
+    width:210px;height:210px;border-radius:50%;flex-shrink:0;margin:auto;
+    border:2px solid var(--line2);position:relative;
+    background:radial-gradient(circle at 50% 45%,rgba(248,243,170,.09),rgba(8,12,28,.2) 70%);
+    box-shadow:0 0 30px rgba(248,243,170,.12),inset 0 0 30px rgba(0,0,0,.5);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .pomo-clock .t{font-size:44px;letter-spacing:.06em;text-shadow:var(--glow);font-variant-numeric:tabular-nums;}
+  .pomo-clock .m{font-size:10px;letter-spacing:.4em;color:var(--ink-faint);margin-top:6px;}
+  .pomo-clock .tick{position:absolute;inset:8px;border-radius:50%;
+    background:conic-gradient(rgba(248,243,170,.5) 0 62%,transparent 62% 100%);
+    -webkit-mask:radial-gradient(circle,transparent 96px,#000 97px);mask:radial-gradient(circle,transparent 96px,#000 97px);}
+  .pomo-right{flex:1;min-width:260px;}
+  .pomo-right h4{font-size:16px;letter-spacing:.1em;margin-bottom:12px;text-shadow:var(--glow);}
+  .pomo-ctrl{display:flex;gap:10px;margin-bottom:18px;}
+  .log{border:1px solid var(--line);border-radius:8px;background:rgba(8,12,28,.45);padding:14px 16px;}
+  .log .row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-dim);
+    padding:7px 0;border-bottom:1px dashed var(--line);}
+  .log .row:last-child{border-bottom:none;}
+  .note-area{
+    margin-top:14px;border:1px dashed var(--line2);border-radius:8px;padding:12px 14px;
+    font-size:12.5px;color:var(--ink-dim);line-height:1.9;font-style:italic;
+    background:repeating-linear-gradient(transparent 0 25px,rgba(248,243,170,.06) 25px 26px);
+  }
+
+  /* ============ Job Content 四象限 ============ */
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:22px;}
+  .qcell{border:1px solid var(--line);border-radius:8px;padding:16px 18px;background:rgba(9,14,32,.5);min-height:150px;}
+  .qcell h5{font-size:14.5px;letter-spacing:.12em;margin-bottom:12px;text-shadow:var(--glow);
+    display:flex;align-items:center;gap:8px;}
+  .qcell li{list-style:none;font-size:12.5px;color:var(--ink-dim);padding:6px 0;
+    border-bottom:1px dashed var(--line);display:flex;gap:8px;}
+  .qcell li::before{content:"›";color:var(--ink-faint);}
+
+  /* ============ EUR trvl ============ */
+  .trvl{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;padding:22px;}
+  .map-card{
+    border:1px solid var(--line2);border-radius:8px;min-height:260px;position:relative;overflow:hidden;
+    background:
+      radial-gradient(circle at 30% 40%,rgba(90,120,220,.25),transparent 45%),
+      radial-gradient(circle at 70% 65%,rgba(248,243,170,.12),transparent 40%),
+      rgba(8,12,28,.6);
+  }
+  .map-grid{position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(0deg,rgba(248,243,170,.06) 0 1px,transparent 1px 34px),
+      repeating-linear-gradient(90deg,rgba(248,243,170,.06) 0 1px,transparent 1px 34px);}
+  .pin{position:absolute;font-size:18px;filter:drop-shadow(0 0 6px rgba(248,243,170,.6));}
+  .route{position:absolute;left:18%;top:30%;width:60%;height:40%;border:none;
+    border-top:2px dashed rgba(248,243,170,.5);transform:rotate(16deg);}
+  .map-label{position:absolute;left:0;right:0;bottom:0;padding:12px 16px;
+    background:linear-gradient(transparent,rgba(5,8,18,.9));font-size:12px;color:var(--ink-dim);
+    display:flex;justify-content:space-between;align-items:center;}
+  .plan-card{border:1px solid var(--line);border-radius:8px;padding:16px 18px;background:rgba(9,14,32,.5);}
+  .plan-card h5{font-size:14.5px;letter-spacing:.14em;margin-bottom:12px;text-shadow:var(--glow);}
+  .plan-it{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:12.5px;color:var(--ink-dim);}
+  .plan-it b{color:var(--ink);font-weight:400;min-width:52px;font-variant-numeric:tabular-nums;}
+
+  /* ============ 语言打卡（KR/US 通用） ============ */
+  .lang{padding:22px;display:grid;grid-template-columns:1fr 1.1fr;gap:18px;}
+  .cal{border:1px solid var(--line);border-radius:8px;padding:16px;background:rgba(9,14,32,.5);}
+  .cal h5{font-size:14px;letter-spacing:.16em;text-align:center;margin-bottom:12px;text-shadow:var(--glow);}
+  .cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;}
+  .cal-g .wd{font-size:10px;color:var(--ink-faint);padding:4px 0;}
+  .cal-g .d{
+    aspect-ratio:1;border:1px solid var(--line);border-radius:6px;font-size:11.5px;
+    display:flex;align-items:center;justify-content:center;color:var(--ink-dim);position:relative;
+  }
+  .cal-g .d.hit{background:rgba(248,243,170,.13);border-color:var(--line2);color:var(--ink);text-shadow:var(--glow);}
+  .cal-g .d.hit::after{content:"✓";position:absolute;right:2px;bottom:1px;font-size:8px;color:var(--ink);}
+  .cal-g .d.today{border-color:var(--ink);box-shadow:0 0 8px rgba(248,243,170,.35);}
+  .mods{display:flex;flex-direction:column;gap:10px;}
+  .mod{
+    border:1px solid var(--line);border-radius:8px;padding:12px 16px;background:rgba(9,14,32,.5);
+    display:flex;align-items:center;gap:14px;
+  }
+  .mod .mi{font-size:17px;filter:sepia(1) hue-rotate(10deg) saturate(3) brightness(1.15);}
+  .mod b{font-size:13.5px;font-weight:400;letter-spacing:.08em;flex:1;}
+  .mod .st{font-size:10.5px;color:var(--ink-faint);letter-spacing:.1em;}
+  .mod .st.ok{color:var(--ink);text-shadow:var(--glow);}
+
+  /* ============ 笔记模块 ============ */
+  .notes{display:grid;grid-template-columns:1fr 1.35fr;gap:18px;padding:22px;}
+  .nlist{border:1px solid var(--line);border-radius:8px;background:rgba(9,14,32,.5);overflow:hidden;}
+  .nlist .nl-h{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .nlist .nl-h b{font-size:13.5px;letter-spacing:.14em;text-shadow:var(--glow);font-weight:400;}
+  .nitem{padding:12px 16px;border-bottom:1px dashed var(--line);}
+  .nitem.on{background:rgba(248,243,170,.07);border-left:3px solid var(--ink);}
+  .nitem b{font-size:13px;font-weight:400;display:block;margin-bottom:4px;}
+  .nitem span{font-size:11px;color:var(--ink-faint);}
+  .npad{border:1px solid var(--line);border-radius:8px;background:rgba(9,14,32,.5);padding:18px 20px;}
+  .npad h5{font-size:15px;letter-spacing:.1em;margin-bottom:4px;text-shadow:var(--glow);}
+  .npad .meta{font-size:10.5px;color:var(--ink-faint);letter-spacing:.15em;margin-bottom:12px;}
+  .npad .tools{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .tool{border:1px solid var(--line);border-radius:5px;padding:4px 10px;font-size:11px;color:var(--ink-dim);}
+  .tool.on{color:var(--ink);border-color:var(--line2);text-shadow:var(--glow);background:rgba(248,243,170,.07);}
+  .npad .body{
+    font-size:12.5px;color:var(--ink-dim);line-height:2.05;
+    background:repeating-linear-gradient(transparent 0 25.2px,rgba(248,243,170,.07) 25.2px 26.2px);
+    min-height:120px;
+  }
+  .npad .media{display:flex;gap:10px;margin-top:12px;}
+  .npad .media .ph{width:76px;height:56px;border-radius:5px;border:1px solid var(--line2);
+    background:linear-gradient(135deg,rgba(120,140,220,.4),rgba(248,243,170,.2));
+    display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .doodle{width:120px;height:56px;border:1px dashed var(--line2);border-radius:5px;position:relative;overflow:hidden;}
+  .doodle svg{position:absolute;inset:0;}
+
+  .foot{margin-top:80px;text-align:center;color:var(--ink-faint);font-size:11px;letter-spacing:.3em;}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:3px 12px;
+    font-size:10.5px;color:var(--ink-faint);letter-spacing:.15em;margin-left:10px;vertical-align:middle;}
+
+  @media (max-width:860px){
+    .layout{flex-direction:column;}
+    .side{width:100%;}
+    .trvl,.lang,.notes,.quad{grid-template-columns:1fr;}
+    .hero h1{font-size:34px;}
+  }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="vignette"></div>
+
+<div class="wrap">
+
+  <!-- 页头 -->
+  <div class="hero">
+    <div class="deco">· Design Preview ·</div>
+    <h1>VINTAGE TO DO LIST</h1>
+    <div class="sub">星际藏蓝 × 荧光淡黄 · 复古工作台设计预览稿</div>
+    <hr class="rule">
+  </div>
+
+  <!-- 0 整体布局 -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">00</span><h2>整体工作台布局<span class="tag">SIDEBAR + MAIN</span></h2></div>
+    <p class="sec-desc">左侧为 10 个模块的固定侧边栏（含关联小图标，按你指定顺序排列），右侧为主内容区。全局藏蓝偏黑星空底，主标题用高亮荧光淡黄 + 辉光，次级信息用暗黄区分层级。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>VINTAGE WORKBENCH</span></div>
+      <div class="layout">
+        <aside class="side">
+          <div class="logo"><b>VINTAGE</b><em>TO DO LIST</em></div>
+          <nav class="nav">
+            <a class="on"><span class="ic">🎓</span>Study Project</a>
+            <a><span class="ic">🗝️</span>Private Info</a>
+            <a><span class="ic">💼</span>Job Content</a>
+            <a><span class="ic">🤖</span>AI skill</a>
+            <a><span class="ic">🗺️</span>EUR trvl</a>
+            <a><span class="ic">🇰🇷</span>Korea language</a>
+            <a><span class="ic">🇺🇸</span>USA language</a>
+            <a><span class="ic">🎬</span>Movie</a>
+            <a><span class="ic">📖</span>Book</a>
+            <a><span class="ic">📜</span>時政及金融筆記匯總</a>
+          </nav>
+        </aside>
+        <section class="main">
+          <h3>Study Project</h3>
+          <div class="date">WEDNESDAY · JULY 29 · 2026</div>
+          <div class="stat-row">
+            <div class="stat"><b>6</b><span>进行中任务</span></div>
+            <div class="stat"><b>14</b><span>已完成</span></div>
+            <div class="stat"><b>3h 25m</b><span>今日番茄专注</span></div>
+            <div class="stat"><b>12 天</b><span>连续打卡</span></div>
+          </div>
+          <div class="titem"><span class="cb"></span><span class="txt">整理线性代数错题本 · 第 4 章</span><span class="thumb">🖼️</span><span class="del">✕</span></div>
+          <div class="titem finished"><span class="cb done">✓</span><span class="txt">完成 Python 爬虫小项目</span><span class="del">✕</span></div>
+          <div class="titem"><span class="cb"></span><span class="txt">阅读论文并做摘要笔记</span><span class="del">✕</span></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1 Study Project -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">01</span><h2>🎓 Study Project<span class="tag">待办 + 图片 + 番茄钟</span></h2></div>
+    <p class="sec-desc">待办清单：可添加 / 勾选完成 / 删除，任务可上传图片（默认缩略图，点击放大）。点击任意任务进入详情页 → 番茄计时器 + 学习时长记录 + 简易学习内容笔记。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>STUDY PROJECT · LIST</span></div>
+      <div class="todo-box">
+        <div class="todo-add"><div class="inp">✎ 写下一个新的学习任务…</div><div class="btn">＋ 添加</div><div class="btn">📎 上传图片</div></div>
+        <div class="titem"><span class="cb"></span><span class="txt">高数第六章·定积分刷题 20 道</span><span class="thumb">🖼️</span><span class="del">✕</span></div>
+        <div class="titem"><span class="cb"></span><span class="txt">背诵专业课名词解释 15 条</span><span class="del">✕</span></div>
+        <div class="titem finished"><span class="cb done">✓</span><span class="txt">整理思维导图（已完成）</span><span class="thumb">🖼️</span><span class="del">✕</span></div>
+        <div class="hint">▸ 点击任务标题 → 进入下方「番茄钟详情页」 ▸ 缩略图点击后弹出大图</div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>STUDY PROJECT · TASK DETAIL · POMODORO</span></div>
+      <div class="pomo">
+        <div class="pomo-clock"><div class="tick"></div><div class="t">15:32</div><div class="m">FOCUS · 25 MIN</div></div>
+        <div class="pomo-right">
+          <h4>▸ 高数第六章 · 定积分刷题 20 道</h4>
+          <div class="pomo-ctrl"><div class="btn small">▶ 开始</div><div class="btn small">⏸ 暂停</div><div class="btn small">↺ 重置</div><div class="btn small">25 / 45 / 60 min</div></div>
+          <div class="log">
+            <div class="row"><span>今日累计专注</span><span>1h 40m（4 🍅）</span></div>
+            <div class="row"><span>07-28 · 番茄 ×3</span><span>1h 15m</span></div>
+            <div class="row"><span>07-27 · 番茄 ×2</span><span>50m</span></div>
+          </div>
+          <div class="note-area">✎ 学习内容速记：今天主攻换元法与分部积分，错题集中在第 12、17 题，明天复盘…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 Private Info -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">02</span><h2>🗝️ Private Info<span class="tag">私密待办 + 图片</span></h2></div>
+    <p class="sec-desc">与 Study Project 同款待办清单（添加 / 勾选 / 删除 / 图片缩略图），视觉上加一枚「私密」印记，数据仅存本地。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>PRIVATE INFO · CONFIDENTIAL 🔏</span></div>
+      <div class="todo-box">
+        <div class="todo-add"><div class="inp">✎ 添加一条私人事项…</div><div class="btn">＋ 添加</div><div class="btn">📎 上传图片</div></div>
+        <div class="titem"><span class="cb"></span><span class="txt">续办护照 · 预约出入境窗口</span><span class="thumb">🖼️</span><span class="del">✕</span></div>
+        <div class="titem"><span class="cb"></span><span class="txt">体检报告复查提醒（8 月中）</span><span class="del">✕</span></div>
+        <div class="titem finished"><span class="cb done">✓</span><span class="txt">更新重要账户备份</span><span class="del">✕</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Job Content -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">03</span><h2>💼 Job Content<span class="tag">四象限周报</span></h2></div>
+    <p class="sec-desc">按「待完成工作 / 完成了什么 / 问题与阻碍 / 下周改进」四宫格排布，每格可独立添加条目，天然形成一份周报。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>JOB CONTENT · WEEKLY BOARD</span></div>
+      <div class="quad">
+        <div class="qcell"><h5>📌 待完成工作</h5><ul><li>Q3 方案初稿 · 周四前</li><li>跨部门数据对齐会</li><li>供应商合同复核</li></ul></div>
+        <div class="qcell"><h5>✅ 完成了什么</h5><ul><li>月度复盘报告已提交</li><li>新流程 SOP 上线</li></ul></div>
+        <div class="qcell"><h5>⚠️ 问题与阻碍</h5><ul><li>接口权限审批卡在 IT 侧</li><li>人力排期冲突</li></ul></div>
+        <div class="qcell"><h5>🔧 下周改进</h5><ul><li>会议压缩到 30 分钟内</li><li>提前一天准备日报素材</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 AI skill -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">04</span><h2>🤖 AI skill<span class="tag">待办 + 图片</span></h2></div>
+    <p class="sec-desc">AI 技能学习清单，同款待办交互（添加 / 勾选 / 删除 / 图片缩略图）。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>AI SKILL · LEARNING LIST</span></div>
+      <div class="todo-box">
+        <div class="todo-add"><div class="inp">✎ 想学的 AI 技能…</div><div class="btn">＋ 添加</div><div class="btn">📎 上传图片</div></div>
+        <div class="titem"><span class="cb"></span><span class="txt">Prompt 工程：结构化提示词模板</span><span class="thumb">🖼️</span><span class="del">✕</span></div>
+        <div class="titem"><span class="cb"></span><span class="txt">用 AI 做周报自动化</span><span class="del">✕</span></div>
+        <div class="titem finished"><span class="cb done">✓</span><span class="txt">AI 生图关键词入门</span><span class="thumb">🖼️</span><span class="del">✕</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 EUR trvl -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">05</span><h2>🗺️ EUR trvl<span class="tag">地图 + 计划</span></h2></div>
+    <p class="sec-desc">左侧「地图」模块：点击直接唤起高德地图（App / 网页版）查看欧洲行程点位；右侧「计划」模块：按天排行程。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>EUR TRVL · MAP & PLAN</span></div>
+      <div class="trvl">
+        <div class="map-card">
+          <div class="map-grid"></div>
+          <hr class="route">
+          <span class="pin" style="left:16%;top:26%;">📍</span>
+          <span class="pin" style="left:46%;top:42%;">📍</span>
+          <span class="pin" style="left:74%;top:60%;">📍</span>
+          <div class="map-label"><span>巴黎 → 苏黎世 → 罗马</span><div class="btn small">🧭 打开高德地图</div></div>
+        </div>
+        <div class="plan-card">
+          <h5>▸ PLAN · 行程计划</h5>
+          <div class="plan-it"><b>D1-3</b><span>巴黎：卢浮宫 / 塞纳河 / 蒙马特</span></div>
+          <div class="plan-it"><b>D4-5</b><span>苏黎世：老城区 / 铁力士雪山</span></div>
+          <div class="plan-it"><b>D6-8</b><span>罗马：斗兽场 / 梵蒂冈</span></div>
+          <div class="plan-it"><b>备忘</b><span>申根签材料 · 欧铁通票 · 转换插头</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 Korea language -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">06</span><h2>🇰🇷 Korea language<span class="tag">打卡日历 + 5 大模块</span></h2></div>
+    <p class="sec-desc">左侧为每日打卡日历（✓ 为已完成学习日，可点某天查看当日状态）；点入某一天后展开右侧 5 大学习模块：单词 / 对话 / 语句 / 文章跟读 / 问题总结。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>KOREA LANGUAGE · DAILY CHECK-IN</span></div>
+      <div class="lang">
+        <div class="cal">
+          <h5>◂ JULY 2026 ▸</h5>
+          <div class="cal-g">
+            <span class="wd">一</span><span class="wd">二</span><span class="wd">三</span><span class="wd">四</span><span class="wd">五</span><span class="wd">六</span><span class="wd">日</span>
+            <span class="d hit">20</span><span class="d hit">21</span><span class="d">22</span><span class="d hit">23</span><span class="d hit">24</span><span class="d">25</span><span class="d hit">26</span>
+            <span class="d hit">27</span><span class="d hit">28</span><span class="d today hit">29</span><span class="d">30</span><span class="d">31</span><span class="d" style="opacity:.3">1</span><span class="d" style="opacity:.3">2</span>
+          </div>
+          <div class="hint" style="text-align:center;">✓ = 当日已打卡 · 点击日期查看详情</div>
+        </div>
+        <div class="mods">
+          <div class="mod"><span class="mi">🈶</span><b>단어 · 单词</b><span class="st ok">已完成 20/20 ✓</span></div>
+          <div class="mod"><span class="mi">💬</span><b>대화 · 对话</b><span class="st ok">已完成 ✓</span></div>
+          <div class="mod"><span class="mi">📝</span><b>문장 · 语句</b><span class="st">进行中 6/10</span></div>
+          <div class="mod"><span class="mi">🎙️</span><b>낭독 · 文章跟读</b><span class="st">未开始</span></div>
+          <div class="mod"><span class="mi">❓</span><b>정리 · 问题总结</b><span class="st">未开始</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 USA language -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">07</span><h2>🇺🇸 USA language<span class="tag">打卡日历 + 5 大模块</span></h2></div>
+    <p class="sec-desc">与 Korea language 同构：打卡日历 + 单词 / 对话 / 语句 / 文章跟读 / 问题总结 五大模块，两个语言互不干扰、独立记录。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>USA LANGUAGE · DAILY CHECK-IN</span></div>
+      <div class="lang">
+        <div class="cal">
+          <h5>◂ JULY 2026 ▸</h5>
+          <div class="cal-g">
+            <span class="wd">一</span><span class="wd">二</span><span class="wd">三</span><span class="wd">四</span><span class="wd">五</span><span class="wd">六</span><span class="wd">日</span>
+            <span class="d">20</span><span class="d hit">21</span><span class="d hit">22</span><span class="d hit">23</span><span class="d">24</span><span class="d hit">25</span><span class="d hit">26</span>
+            <span class="d hit">27</span><span class="d">28</span><span class="d today">29</span><span class="d">30</span><span class="d">31</span><span class="d" style="opacity:.3">1</span><span class="d" style="opacity:.3">2</span>
+          </div>
+          <div class="hint" style="text-align:center;">✓ = 当日已打卡 · 点击日期查看详情</div>
+        </div>
+        <div class="mods">
+          <div class="mod"><span class="mi">🔤</span><b>Words · 单词</b><span class="st ok">已完成 30/30 ✓</span></div>
+          <div class="mod"><span class="mi">💬</span><b>Dialogue · 对话</b><span class="st">进行中</span></div>
+          <div class="mod"><span class="mi">📝</span><b>Sentences · 语句</b><span class="st">未开始</span></div>
+          <div class="mod"><span class="mi">🎙️</span><b>Shadowing · 文章跟读</b><span class="st">未开始</span></div>
+          <div class="mod"><span class="mi">❓</span><b>Review · 问题总结</b><span class="st">未开始</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 Movie -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">08</span><h2>🎬 Movie<span class="tag">观影清单 + 图片</span></h2></div>
+    <p class="sec-desc">想看 / 已看电影清单，同款待办交互，海报以缩略图展示。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>MOVIE · WATCHLIST</span></div>
+      <div class="todo-box">
+        <div class="todo-add"><div class="inp">✎ 想看的电影…</div><div class="btn">＋ 添加</div><div class="btn">📎 上传海报</div></div>
+        <div class="titem"><span class="cb"></span><span class="txt">《星际穿越》重温 · IMAX</span><span class="thumb">🎞️</span><span class="del">✕</span></div>
+        <div class="titem"><span class="cb"></span><span class="txt">《布达佩斯大饭店》</span><span class="thumb">🎞️</span><span class="del">✕</span></div>
+        <div class="titem finished"><span class="cb done">✓</span><span class="txt">《奥本海默》已看 ★★★★☆</span><span class="del">✕</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 Book -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">09</span><h2>📖 Book<span class="tag">书单 + 图片</span></h2></div>
+    <p class="sec-desc">阅读书单，同款待办交互，封面缩略图。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>BOOK · READING LIST</span></div>
+      <div class="todo-box">
+        <div class="todo-add"><div class="inp">✎ 想读的书…</div><div class="btn">＋ 添加</div><div class="btn">📎 上传封面</div></div>
+        <div class="titem"><span class="cb"></span><span class="txt">《置身事内》· 读到第 5 章</span><span class="thumb">📚</span><span class="del">✕</span></div>
+        <div class="titem"><span class="cb"></span><span class="txt">《纳瓦尔宝典》</span><span class="del">✕</span></div>
+        <div class="titem finished"><span class="cb done">✓</span><span class="txt">《被讨厌的勇气》已读完</span><span class="thumb">📚</span><span class="del">✕</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 时政金融笔记 -->
+  <div class="sec">
+    <div class="sec-head"><span class="no">10</span><h2>📜 時政及金融筆記匯總<span class="tag">备忘录式笔记</span></h2></div>
+    <p class="sec-desc">首页为笔记汇总清单，点入单篇如备忘录：支持文字、插图、以及手写涂鸦（画笔工具）。</p>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i><span>NOTES · POLITICS & FINANCE</span></div>
+      <div class="notes">
+        <div class="nlist">
+          <div class="nl-h"><b>▸ 笔记汇总</b><span class="btn small">＋ 新增</span></div>
+          <div class="nitem on"><b>7 月美联储议息会议要点</b><span>07-29 · 文字 + 图 + 涂鸦</span></div>
+          <div class="nitem"><b>A 股半年报观察：高股息板块</b><span>07-25 · 文字</span></div>
+          <div class="nitem"><b>欧元区通胀数据速记</b><span>07-21 · 文字 + 图</span></div>
+          <div class="nitem"><b>时政周评 · 第 30 周</b><span>07-20 · 文字</span></div>
+        </div>
+        <div class="npad">
+          <h5>7 月美联储议息会议要点</h5>
+          <div class="meta">2026-07-29 · 最后编辑 16:40</div>
+          <div class="tools"><span class="tool on">Aa 文字</span><span class="tool">🖼 插入图片</span><span class="tool">✏️ 涂鸦</span><span class="tool">🖍 颜色</span><span class="tool">↺ 撤销</span></div>
+          <div class="body">① 利率决议维持不变，声明措辞偏鸽；<br>② 点阵图暗示年内或有一次调整；<br>③ 关注下周非农与 CPI 数据的联动影响……</div>
+          <div class="media">
+            <div class="ph">🖼️</div>
+            <div class="doodle">
+              <svg viewBox="0 0 120 56"><path d="M8 44 Q 28 10 46 30 T 84 22 T 114 12" fill="none" stroke="#f8f3aa" stroke-width="2" stroke-linecap="round" opacity=".85"/><circle cx="84" cy="22" r="3" fill="#f8f3aa"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">✦ VINTAGE TO DO LIST · DESIGN PREVIEW · CONFIRM TO BUILD ✦</div>
+</div>
+
+<script>
+/* 星空背景：三层视差 + 闪烁 + 少量星云 */
+const cv=document.getElementById('stars'),ctx=cv.getContext('2d');
+let W,H,stars=[];
+function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;make();}
+function make(){
+  stars=[];
+  const n=Math.floor(W*H/2600);
+  for(let i=0;i<n;i++){
+    stars.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:Math.random()<.85?Math.random()*1.1+.2:Math.random()*1.8+.8,
+      a:Math.random()*.7+.15,
+      tw:Math.random()*.02+.004,
+      ph:Math.random()*Math.PI*2,
+      warm:Math.random()<.28
+    });
+  }
+}
+function nebula(){
+  const blobs=[[.2,.25,260,'90,110,200'],[.78,.6,300,'70,90,170'],[.5,.85,220,'150,140,120'],[.9,.15,180,'110,100,180']];
+  blobs.forEach(([px,py,r,c])=>{
+    const g=ctx.createRadialGradient(px*W,py*H,0,px*W,py*H,r);
+    g.addColorStop(0,`rgba(${c},0.10)`);g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  });
+}
+let t=0;
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#0a1024');bg.addColorStop(.5,'#070b18');bg.addColorStop(1,'#05070f');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  nebula();
+  t+=1;
+  for(const s of stars){
+    const tw=s.a*(0.6+0.4*Math.sin(t*s.tw+s.ph));
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,7);
+    ctx.fillStyle=s.warm?`rgba(248,243,170,${tw})`:`rgba(220,230,255,${tw})`;
+    ctx.fill();
+    if(s.r>1.4){
+      ctx.strokeStyle=`rgba(248,243,170,${tw*.4})`;ctx.lineWidth=.6;
+      ctx.beginPath();
+      ctx.moveTo(s.x-s.r*3,s.y);ctx.lineTo(s.x+s.r*3,s.y);
+      ctx.moveTo(s.x,s.y-s.r*3);ctx.lineTo(s.x,s.y+s.r*3);
+      ctx.stroke();
+    }
+  }
+  requestAnimationFrame(draw);
+}
+addEventListener('resize',resize);resize();draw();
+</script>
+</body>
+</html>

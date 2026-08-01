@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 · CSS 规范代码库 — VINTAGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:linear-gradient(135deg,#070B14 0%,#111B2D 100%);
+  min-height:100vh;font-family:-apple-system,'Segoe UI',sans-serif;
+  color:rgba(255,255,255,0.85);padding:20px;position:relative;
+}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(100,150,230,0.04) 0%,transparent 50%);pointer-events:none}
+
+.top{display:flex;align-items:center;gap:24px;padding:12px 28px;margin-bottom:24px;
+  background:rgba(7,11,20,0.8);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;max-width:900px;width:100%;margin-left:auto;margin-right:auto}
+.back{color:rgba(255,255,255,0.5);text-decoration:none;font-size:12px;transition:.2s}
+.back:hover{color:#6496E6}
+.title{font-family:'Pinyon Script',cursive;font-size:26px;
+  background:linear-gradient(135deg,#F3A183,#D4AF37);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;
+  text-shadow:0 0 20px rgba(212,175,55,0.1);filter:brightness(1.1)}
+.badge{font-size:10px;color:rgba(100,150,230,0.6);border:1px solid rgba(100,150,230,0.2);padding:2px 8px;border-radius:20px}
+
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+.spec-card{padding:24px;border-radius:16px;
+  background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08)}
+.spec-card h3{font-size:13px;font-weight:500;color:#6496E6;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px}
+.code-block{background:rgba(0,0,0,0.35);border-radius:10px;padding:18px;
+  border:1px solid rgba(255,255,255,0.05);overflow-x:auto}
+code{font-family:'Fira Code','Consolas',monospace;font-size:11.5px;line-height:1.8;
+  color:rgba(255,255,255,0.73);white-space:pre;display:block}
+.c-cmt{color:rgba(255,255,255,0.23)}
+.c-kw{color:#F3A183}
+.c-val{color:#6496E6}
+.c-fn{color:rgba(150,200,255,0.78)}
+
+.note{font-size:11px;color:rgba(255,255,255,0.28);margin-top:10px;line-height:1.7}
+
+.nav{text-align:center;margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)}
+.nav a{color:rgba(255,255,255,0.38);text-decoration:none;font-size:12px;margin:0 14px;transition:.2s}
+.nav a:hover{color:#D4AF37}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="back" href="index.html">← Hub</a>
+  <div class="title">Vintage</div>
+  <span class="badge">05 · CSS 规范</span>
+</div>
+
+<div class="wrap">
+
+<!-- Color Tokens -->
+<div class="spec-card">
+  <h3>🎨 颜色令牌（已选深空蓝主题）</h3>
+  <div class="code-block"><code><span class="c-cmt">/* 背景色 */</span>
+<span class="c-kw">--bg-deep:</span>     <span class="c-val">#070B14</span>;
+<span class="c-kw">--bg-surface:</span>   <span class="c-val">#111B2D</span>;
+<span class="c-kw">--bg-glass:</span>     <span class="c-val">rgba(255, 255, 255, 0.04)</span>;
+
+<span class="c-cmt">/* 琥珀金点缀（标题/完成态） */</span>
+<span class="c-kw">--gold-primary:</span> <span class="c-val">#D4AF37</span>;
+<span class="c-kw">--gold-light:</span>   <span class="c-val">#F3A183</span>;
+<span class="c-kw">--gold-dark:</span>    <span class="c-val">#8B6914</span>;
+<span class="c-kw">--gold-glow:</span>    <span class="c-val">#FCEABB</span>;
+
+<span class="c-cmt">/* 深空蓝主色调（图标/选中态/强调） */</span>
+<span class="c-kw">--blue-primary:</span> <span class="c-val">#6496E6</span>;
+<span class="c-kw">--blue-glow:</span>    <span class="c-val">rgba(100, 150, 230, 0.5)</span>;
+
+<span class="c-cmt">/* 文字 — 禁用纯白色 */</span>
+<span class="c-kw">--text-primary:</span>   <span class="c-val">rgba(255, 255, 255, 0.95)</span>;
+<span class="c-kw">--text-secondary:</span> <span class="c-val">rgba(255, 255, 255, 0.65)</span>;
+<span class="c-kw">--text-muted:</span>      <span class="c-val">rgba(255, 255, 255, 0.33)</span>;
+
+<span class="c-cmt">/* 边框与玻璃 */</span>
+<span class="c-kw">--border-subtle:</span>  <span class="c-val">rgba(255, 255, 255, 0.08)</span>;
+<span class="c-kw">--border-active:</span>   <span class="c-val">rgba(100, 150, 230, 0.25)</span>;</code></div>
+</div>
+
+<!-- Glassmorphism -->
+<div class="spec-card">
+  <h3>💎 玻璃拟态标准参数</h3>
+  <div class="code-block"><code>.<span class="c-fn">glass-card</span> {
+  <span class="c-kw">background:</span>      <span class="c-val">rgba(255, 255, 255, 0.04)</span>;
+  <span class="c-kw">backdrop-filter:</span> <span class="c-val">blur(24px)</span>;
+  -<span class="c-fn">webkit-backdrop-filter</span>: <span class="c-val">blur(24px)</span>;
+  <span class="c-kw">border:</span>          <span class="c-val">1px solid rgba(255, 255, 255, 0.08)</span>;
+  <span class="c-kw">border-radius:</span>    <span class="c-val">16px</span>;
+}</code></div>
+  <div class="note">所有卡片使用此基础。Z 轴深度通过阴影强度和玻璃透明度控制。</div>
+</div>
+
+<!-- Title Typography -->
+<div class="spec-card">
+  <h3>&#9998; 标题 "Vintage" — 法式手写体（5 款待选）</h3>
+  <div class="code-block"><code><span class="c-cmt">/* 候选：Pinyon Script(默认) / Tangerine 700 / Alex Brush / Mrs Saint Delafield / Petit Formal Script */</span>
+<span class="c-cmt">/* 详见 sec-06-fonts.html 逐款对比，定稿后替换下方 font-family 即可 */</span>
+.<span class="c-fn">brand-title</span> {
+  <span class="c-kw">font-family:</span> <span class="c-val">'Pinyon Script', cursive</span>;
+  <span class="c-kw">font-size:</span>     <span class="c-val">36pt</span>;        <span class="c-cmt">/* 或 28–32px 响应式 */</span>
+  <span class="c-kw">letter-spacing:</span> <span class="c-val">2px</span>;
+  <span class="c-kw">color:</span>         <span class="c-val">transparent</span>;
+  <span class="c-kw">background:</span>     <span class="c-val">linear-gradient(135deg, #F3A183, #D4AF37)</span>;
+  <span class="c-kw">-webkit-background-clip:</span> <span class="c-val">text</span>;
+  <span class="c-kw">-webkit-text-fill-color:</span> <span class="c-val">transparent</span>;
+  <span class="c-cmt">/* 加粗效果：通过 text-shadow + brightness 模拟 */</span>
+  <span class="c-kw">text-shadow:</span>    <span class="c-val">0 0 25px rgba(212,175,55,0.12), 0 0 50px rgba(212,175,55,0.06)</span>;
+  <span class="c-kw">filter:</span>         <span class="c-val">brightness(1.1)</span>;
+}
+
+<span class="c-cmt">/* 副标题 "ENTER STARPORT" — Inter/SF Pro 无衬线 */</span>
+.<span class="c-fn">subtitle</span> {
+  <span class="c-kw">font-family:</span> <span class="c-val">'Inter', sans-serif</span>;
+  <span class="c-kw">text-transform:</span> <span class="c-val">uppercase</span>;
+  <span class="c-kw">letter-spacing:</span> <span class="c-val">4px</span>;
+  <span class="c-kw">color:</span> <span class="c-val">rgba(255, 255, 255, 0.42)</span>;
+  <span class="c-kw">font-weight:</span> <span class="c-val">300</span>;
+}</code></div>
+</div>
+
+<!-- Nav Icons - Option B (Light Trail Glow) -->
+<div class="spec-card">
+  <h3>&#128760; 导航图标 · 方案B 光轨流辉（已锁定）</h3>
+
+  <div style="margin-bottom:14px;font-weight:500;font-size:12px;color:rgba(255,255,255,0.7)">通用样式（4 枚共用）</div>
+  <div class="code-block"><code>.<span class="c-fn">nav-icon</span> svg { width: 24px; height: 24px; overflow: visible; }
+.<span class="c-fn">nav-icon</span> svg .st {   <span class="c-cmt">/* 描边元素 */</span>
+  stroke: rgba(255,255,255,0.5); stroke-width: 1.5; fill: none;
+  stroke-linecap: round; stroke-linejoin: round; transition: all .3s;
+}
+.<span class="c-fn">nav-icon</span> svg .fl { fill: rgba(255,255,255,0.5); transition: all .3s; }
+.<span class="c-fn">nav-icon</span> svg .halo { opacity: 0; transition: opacity .35s; }
+
+<span class="c-cmt">/* 选中态：琥珀金 + 呼吸光晕 + 上浮 2px */</span>
+.<span class="c-fn">nav-item.active</span> .nav-icon {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 0 7px rgba(212,175,55,.75));
+}
+.<span class="c-fn">nav-item.active</span> .nav-icon svg .st { stroke: #D4AF37; stroke-width: 1.6; }
+.<span class="c-fn">nav-item.active</span> .nav-icon svg .fl { fill: #D4AF37; }
+.<span class="c-fn">nav-item.active</span> .nav-icon svg .halo { opacity: 1; }
+.<span class="c-fn">nav-item</span>:active { transform: scale(0.9); }</code></div>
+
+  <div style="margin:14px 0 8px;font-weight:500;font-size:12px;color:rgba(255,255,255,0.7)">HOME — 恒星（实心核 + 光晕环）</div>
+  <div class="code-block"><code>&lt;svg viewBox="0 0 24 24"&gt;
+  &lt;circle class="halo" cx="12" cy="12" r="9"  fill="none"
+          stroke="#D4AF37" stroke-width=".6" opacity=".25"/&gt;
+  &lt;circle class="fl"   cx="12" cy="12" r="4"/&gt;
+  &lt;circle class="st"   cx="12" cy="12" r="7.5" opacity=".45"/&gt;
+&lt;/svg&gt;</code></div>
+
+  <div style="margin:14px 0 8px;font-weight:500;font-size:12px;color:rgba(255,255,255,0.7)">ORBIT — 流星轨迹（贝塞尔曲线 + 末端亮点 + 流动动画）</div>
+  <div class="code-block"><code>&lt;svg viewBox="0 0 24 24"&gt;
+  &lt;path   class="st comet-p" d="M3 19 Q12 3 21 9"/&gt;
+  &lt;circle class="fl"   cx="21" cy="9" r="2.2"/&gt;
+  &lt;circle class="halo" cx="21" cy="9" r="4.5" fill="none"
+          stroke="#D4AF37" stroke-width=".6" opacity=".3"/&gt;
+&lt;/svg&gt;
+
+<span class="c-cmt">/* 选中时轨迹循环流动 */</span>
+@keyframes trail { 0%{stroke-dashoffset:26} 100%{stroke-dashoffset:0} }
+.<span class="c-fn">nav-item.active</span> .comet-p {
+  stroke-dasharray: 26; animation: trail 2.2s linear infinite;
+}</code></div>
+
+  <div style="margin:14px 0 8px;font-weight:500;font-size:12px;color:rgba(255,255,255,0.7)">PULSE — 脉冲波纹（双圆 + 中轴 + 交替涟漪）</div>
+  <div class="code-block"><code>&lt;svg viewBox="0 0 24 24"&gt;
+  &lt;circle class="st" cx="12" cy="6.5"  r="3.2"/&gt;
+  &lt;circle class="st" cx="12" cy="17.5" r="3.2"/&gt;
+  &lt;line   class="st" x1="12" y1="9.7" x2="12" y2="14.3"/&gt;
+  &lt;circle class="halo pulse-r"  cx="12" cy="6.5"  r="3"
+          fill="none" stroke="#D4AF37" stroke-width=".8"/&gt;
+  &lt;circle class="halo pulse-r2" cx="12" cy="17.5" r="3"
+          fill="none" stroke="#D4AF37" stroke-width=".8"/&gt;
+&lt;/svg&gt;
+
+@keyframes ripple { 0%{r:3;opacity:.85} 100%{r:9;opacity:0} }
+.<span class="c-fn">nav-item.active</span> .pulse-r  { animation: ripple 1.8s ease-out infinite; }
+.<span class="c-fn">nav-item.active</span> .pulse-r2 { animation: ripple 1.8s ease-out .9s infinite; }</code></div>
+
+  <div style="margin:14px 0 8px;font-weight:500;font-size:12px;color:rgba(255,255,255,0.7)">RING — 倾斜星环（细线椭圆 + 选中浮现核心）</div>
+  <div class="code-block"><code>&lt;svg viewBox="0 0 24 24"&gt;
+  &lt;ellipse class="st" cx="12" cy="12" rx="10" ry="4.2"
+           transform="rotate(-20 12 12)"/&gt;
+  &lt;circle  class="halo" cx="12" cy="12" r="1.6" fill="#D4AF37"/&gt;
+&lt;/svg&gt;</code></div>
+
+  <div class="note"><strong>非选中：</strong>描边 rgba(255,255,255,0.5)、stroke-width 1.5px、无发光、无背景框。<br>
+  <strong>选中：</strong>#D4AF37 + drop-shadow(0 0 7px) + translateY(-2px) + 对应动画启动。<br>
+  <strong>按压：</strong>scale(0.9)，回弹 cubic-bezier(.34,1.56,.64,1) / 0.25s。<br>
+  <strong>标签：</strong>Home / Orbit / Pulse / Ring，9px、font-weight 300、letter-spacing 1px。</div>
+</div>
+
+<!-- Micro-interactions -->
+<div class="spec-card">
+  <h3>✨ 微交互动画关键帧</h3>
+  <div class="code-block"><code><span class="c-cmt">/* 弹性按压回弹 */</span>
+.<span class="c-fn">elastic</span>:active {
+  <span class="c-kw">transform:</span> <span class="c-val">scale(0.96)</span>;
+  <span class="c-kw">transition:</span> <span class="c-val">all 0.3s cubic-bezier(.34, 1.56, .64, 1)</span>;
+}
+
+<span class="c-cmt">/* 粒子喷溅 — JS 创建元素后应用此动画 */</span>
+@<span class="c-fn">keyframes</span> p-burst {
+  <span class="c-kw">0%</span>   { <span class="c-fn">opacity</span>: 1; <span class="c-fn">transform</span>: translate(0,0) scale(1) }
+  <span class="c-kw">100%</span> { <span class="c-fn">opacity</span>: 0; <span class="c-fn">transform</span>: translate(var(--tx), var(--ty)) scale(0) }
+}
+
+<span class="c-cmt">/* 完成扫光 */</span>
+.<span class="c-fn">sweep-card</span>::after {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg,
+    transparent, rgba(100,150,230,.08), transparent);
+  transition: left .5s ease;
+}
+.<span class="c-fn">sweep-card.swept</span>::after { left: 150%; }
+
+<span class="c-cmt">/* 侧边栏弹簧滑入 */</span>
+@<span class="c-fn">keyframes</span> sidebar-slide {
+  from { transform: translateX(-100%) }
+  to   { transform: translateX(0) }
+}
+.<span class="c-fn">sidebar</span> { animation: sidebar-slide .45s cubic-bezier(.22, 1, .36, 1) }</code></div>
+</div>
+
+<!-- Forbidden Rules -->
+<div class="spec-card" style="border-color:rgba(220,80,80,0.13)">
+  <h3 style="color:rgba(240,120,120,0.65)">🚫 禁用规则</h3>
+  <div class="code-block"><code><span class="c-cmt">/* 生产环境中禁止使用以下写法 */</span>
+
+<span class="c-cmt">/* ❌ 纯白文字 */</span>
+<span class="c-kw">color:</span> <span class="c-val">#FFFFFF</span>;
+<span class="c-cmt">/* → 替换为 rgba(255,255,255, 0.85~0.95) */</span>
+
+<span class="c-cmt">/* ❌ 硬边阴影（无模糊值） */</span>
+<span class="c-kw">box-shadow:</span> <span class="c-val">0 4px 0 #000</span>;
+<span class="c-cmt">/* → 必须包含 blur-radius + opacity */</span>
+
+<span class="c-cmt">/* ❌ 纯黑背景 */</span>
+<span class="c-kw">background:</span> <span class="c-val">#000</span>;
+<span class="c-cmt">/* → 使用 #070B14 ~ #111B2D 渐变 */</span>
+
+<span class="c-cmt">/* ❌ 导航图标外层方框/圆形背景 */</span>
+<span class="c-cmt">/* 图标必须是纯形状，不可包裹容器 */</span></code></div>
+</div>
+
+</div>
+
+<div class="nav">
+  <a href="sec-04-interact.html">← 交互动效</a>
+  <a href="sec-06-fonts.html">字体方案</a>
+  <a href="sec-00-icon.html">图标页</a>
+  <a href="index.html">Hub</a>
+</div>
+
+</body>
+</html>

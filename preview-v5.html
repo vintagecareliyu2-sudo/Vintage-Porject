@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vintage — V5 Final Spec Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   V5 FINAL DESIGN SYSTEM — Space Age Retro · Amber Gold
+   ═══════════════════════════════════════════ */
+:root{
+  --navy-1:#070B14;
+  --navy-2:#111B2D;
+  --amber:#D4AF37;
+  --champagne:#F3A183;
+  --gold-grad:linear-gradient(135deg,#F3A183 0%,#D4AF37 100%);
+  --gold-grad-solid:linear-gradient(135deg,#FCEABB 0%,#D4AF37 50%,#A67B1E 100%);
+  --sphere-grad:radial-gradient(circle at 30% 25%,#FFF8E1 0%,#D4AF37 60%,#8B6914 100%);
+  --diamond-grad:linear-gradient(135deg,#FCEABB 0%,#D4AF37 50%,#A67B1E 100%);
+  --fluor:rgba(255,255,255,0.9);
+  --fluor-dim:rgba(255,255,255,0.55);
+  --glass-bg:rgba(255,255,255,0.04);
+  --glass-border:rgba(255,255,255,0.08);
+  --glass-blur:24px;
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:linear-gradient(150deg,var(--navy-1) 0%,var(--navy-2) 60%,#0d1424 100%);
+  color:var(--fluor); min-height:100vh; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* Noise */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
+/* Pale gold nebula ≤6% (parallax drift target) */
+#nebula{position:fixed;top:-15%;left:-10%;width:70%;height:80%;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at center,rgba(212,175,55,0.06) 0%,transparent 65%);
+  transition:transform 0.6s ease-out;}
+
+/* Vintage title — Parisienne */
+.vintage-title{
+  font-family:'Parisienne',cursive; font-weight:400; font-size:36pt;
+  letter-spacing:2px; line-height:1;
+  background:var(--gold-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 18px rgba(212,175,55,0.22));
+}
+
+/* Glass standard */
+.glass{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius);
+  backdrop-filter:blur(var(--glass-blur));-webkit-backdrop-filter:blur(var(--glass-blur));}
+
+/* Section */
+.section-title{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;
+  color:var(--fluor-dim);margin:48px 0 16px;padding-left:12px;border-left:2px solid var(--amber);}
+.ver-tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:2px;padding:2px 8px;
+  border-radius:20px;margin-left:8px;vertical-align:middle;background:rgba(212,175,55,0.15);
+  color:var(--amber);border:1px solid rgba(212,175,55,0.3);}
+
+/* Toggle pill */
+.switcher{display:flex;gap:12px;margin:24px 0;justify-content:center;flex-wrap:wrap;}
+.sw-btn{padding:8px 22px;border-radius:30px;cursor:pointer;font-size:11px;font-weight:500;
+  letter-spacing:2px;transition:all .3s;border:1px solid var(--glass-border);background:var(--glass-bg);
+  color:var(--fluor-dim);backdrop-filter:blur(10px);}
+.sw-btn:hover{border-color:var(--amber);color:var(--fluor);}
+.sw-btn.active{background:var(--gold-grad);border-color:transparent;color:#070B14;font-weight:600;}
+
+.page-wrapper{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px;}
+
+/* Orbit ring */
+.orbit-ring{position:relative;width:44px;height:44px;}
+.orbit-ring svg{transform:rotate(-90deg);}
+.orbit-ring .ot{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:2.5;}
+.orbit-ring .of{fill:none;stroke:var(--amber);stroke-width:2.5;stroke-linecap:round;
+  stroke-dasharray:126;stroke-dashoffset:calc(126 - 126*var(--p,0)/100);
+  transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);
+  filter:drop-shadow(0 0 4px rgba(212,175,55,0.45));}
+.orbit-ring .otxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:600;color:var(--fluor-dim);}
+
+/* Particle splash */
+.particle{position:absolute;width:4px;height:4px;border-radius:1px;background:var(--amber);
+  pointer-events:none;opacity:0;box-shadow:0 0 6px var(--amber);}
+
+/* Elastic sink for cards/buttons */
+.bounce-tap{transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);}
+.bounce-tap:active{transform:scale(0.96);}
+
+/* Gold sweep */
+.sweep-wrap{position:relative;overflow:hidden;}
+.sweep-wrap::after{content:'';position:absolute;top:0;left:-100%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.12),transparent);pointer-events:none;}
+.sweep-wrap.sweeping::after{animation:goldSweep .7s ease-out forwards;}
+@keyframes goldSweep{0%{left:-100%;}100%{left:200%;}}
+
+/* Selection bar */
+.sel-bar{position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;
+  border-radius:3px;background:var(--amber);box-shadow:0 0 8px rgba(212,175,55,0.6);}
+.dot-div{border:none;border-top:1px dotted rgba(255,255,255,0.1);margin:4px 16px;}
+.arc-line{height:12px;margin:2px 16px;position:relative;}
+.arc-line::before{content:'';position:absolute;bottom:-1px;left:30%;right:30%;height:1px;
+  border-top:1px solid rgba(255,255,255,0.08);border-radius:50%;}
+
+/* ═══ DESKTOP ═══ */
+.desktop-mock{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:680px;border-radius:var(--radius);overflow:hidden;}
+.sidebar{padding:20px 0;display:flex;flex-direction:column;border-right:1px solid var(--glass-border);
+  position:relative;transition:transform .5s cubic-bezier(0.22,1,0.36,1);}
+.sidebar-header{padding:0 20px 18px;text-align:center;}
+.sidebar-menu{flex:1;}
+.sb-item{position:relative;display:flex;align-items:center;padding:12px 20px;cursor:pointer;
+  transition:all .25s;color:var(--fluor-dim);font-size:13px;letter-spacing:.5px;}
+.sb-item:hover{color:var(--fluor);background:rgba(255,255,255,0.03);}
+.sb-item.active{color:var(--amber);}
+.sb-item.active .sb-icon{filter:drop-shadow(0 0 6px rgba(212,175,55,.5));}
+.sb-icon{width:18px;height:18px;margin-right:12px;flex-shrink:0;stroke:currentColor;fill:none;
+  stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.sb-label{flex:1;}
+.orbit-dot{display:inline-block;width:14px;height:14px;margin-left:6px;vertical-align:middle;
+  animation:orbitSpin 4s linear infinite;}
+.orbit-dot svg{width:14px;height:14px;}
+@keyframes orbitSpin{to{transform:rotate(360deg);}}
+
+.main-area{background:rgba(0,0,0,0.18);padding:0;position:relative;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;margin:16px;
+  border-radius:var(--radius);}
+.stats-row{display:flex;gap:14px;flex-wrap:wrap;padding:0 16px;}
+.stat-card{flex:1;min-width:130px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+.stat-card .si{font-size:22px;}
+.stat-info h4{font-size:10px;font-weight:500;letter-spacing:2px;color:var(--fluor-dim);
+  text-transform:uppercase;margin-bottom:4px;}
+.stat-info .val{font-size:20px;font-weight:300;color:var(--fluor);}
+.content-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px;}
+.panel{padding:20px;}
+.panel h3{font-size:13px;font-weight:500;letter-spacing:1px;margin-bottom:14px;color:var(--fluor);}
+
+/* Todo */
+.todo-list{list-style:none;}
+.ti{display:flex;align-items:center;padding:10px 0;border-bottom:1px dotted rgba(255,255,255,0.06);
+  cursor:pointer;transition:all .2s;position:relative;}
+.ti:last-child{border-bottom:none;}
+.ti:hover{background:rgba(255,255,255,0.02);}
+.chk{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;margin-right:12px;flex-shrink:0;
+  transition:all .25s;cursor:pointer;}
+.chk.checked{background:var(--amber);border-color:var(--amber);box-shadow:0 0 10px rgba(212,175,55,.35);}
+.chk svg{width:11px;height:11px;stroke:#070B14;stroke-width:2.5;fill:none;opacity:0;transition:opacity .2s;}
+.chk.checked svg{opacity:1;}
+.ti-text{flex:1;font-size:12.5px;color:var(--fluor-dim);}
+.ti-text.done{text-decoration:line-through;opacity:.45;}
+.ti-badge{font-size:9px;color:var(--fluor-dim);opacity:.5;background:rgba(255,255,255,0.05);
+  padding:2px 7px;border-radius:10px;}
+
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;cursor:pointer;transition:all .25s;position:relative;
+  border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);}
+.cal-day:hover{border-color:rgba(255,255,255,0.15);}
+.cal-day.done{background:rgba(212,175,55,0.12);border-color:rgba(212,175,55,0.3);}
+.cal-day.done::after{content:'✓';font-size:10px;color:var(--amber);}
+.cal-day.today{border-color:#6C63FF;box-shadow:0 0 8px rgba(108,99,255,.2);}
+.cal-day.empty{visibility:hidden;}
+
+/* City + Notes */
+.city-card{padding:14px;margin-bottom:10px;cursor:pointer;transition:all .25s;}
+.city-card:hover{background:rgba(255,255,255,0.04);transform:translateX(4px);}
+.city-name{font-size:14px;font-weight:500;color:var(--fluor);letter-spacing:1px;}
+.city-meta{font-size:10px;color:var(--fluor-dim);margin-top:4px;}
+.note-item{padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.note-item:hover{background:rgba(255,255,255,0.03);}
+.note-title{font-size:12.5px;color:var(--fluor);}
+.note-date{font-size:9px;color:var(--fluor-dim);opacity:.5;margin-top:2px;}
+
+/* ═══ LOGIN ═══ */
+.login-mock{max-width:380px;margin:0 auto;padding:40px 28px;text-align:center;}
+.login-title-v{font-size:44pt;}
+.login-sub{font-family:'Inter',sans-serif;font-size:12px;font-weight:300;letter-spacing:4px;
+  text-transform:uppercase;color:rgba(255,255,255,0.7);margin:8px 0 32px;}
+.login-tabs{display:flex;margin-bottom:24px;}
+.ltab{flex:1;padding:10px;text-align:center;font-size:11px;font-weight:500;cursor:pointer;
+  border-bottom:1.5px solid transparent;transition:all .25s;color:var(--fluor-dim);letter-spacing:1px;}
+.ltab.active{border-bottom-color:var(--amber);color:var(--fluor);}
+.linput{width:100%;padding:12px 16px;margin-bottom:12px;border-radius:12px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);color:var(--fluor);
+  font-size:13px;outline:none;font-family:'Inter';transition:all .25s;}
+.linput:focus{border-color:rgba(212,175,55,.3);box-shadow:0 0 0 2px rgba(212,175,55,.08);}
+.linput::placeholder{color:rgba(255,255,255,0.25);}
+.lbtn{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
+  font-family:'Inter';font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,0.88);background:var(--gold-grad);
+  border:1px solid rgba(212,175,55,0.35);transition:all .3s;margin-top:8px;}
+.lbtn:hover{box-shadow:0 4px 20px rgba(212,175,55,.18);}
+.llinks{margin-top:16px;font-size:10px;color:var(--fluor-dim);}
+.llinks span{cursor:pointer;}
+.llinks span:hover{color:var(--fluor);}
+
+/* ═══ MOBILE ═══ */
+.mobile-frame{width:330px;height:700px;border-radius:40px;overflow:hidden;position:relative;
+  margin:0 auto;border:1px solid var(--glass-border);
+  box-shadow:0 24px 70px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;}
+.mobile-notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:100px;height:28px;
+  background:#000;border-radius:20px;z-index:10;}
+.mobile-inner{height:100%;overflow-y:auto;padding:46px 16px 90px;}
+.mobile-hdr{text-align:center;padding:14px 0 10px;}
+.mobile-cards{display:flex;flex-direction:column;gap:12px;}
+/* Z-axis hierarchy */
+.mcard{transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);}
+.mcard.primary{box-shadow:0 8px 32px rgba(212,175,55,0.15);background:rgba(255,255,255,0.05);}
+.mcard.secondary{box-shadow:0 4px 16px rgba(0,0,0,0.25);background:rgba(255,255,255,0.03);}
+.mcard:active{transform:scale(0.96);}
+
+/* Bottom nav glass */
+.mob-nav{position:absolute;bottom:0;left:0;right:0;z-index:20;
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  background:rgba(0,0,0,0.4);padding-top:1px;}
+.mob-nav::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.2),transparent);}
+.nav-items{display:flex;justify-content:space-around;padding:12px 0 26px;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .25s;}
+.nav-label{font-size:9pt;font-weight:300;letter-spacing:1px;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;transition:color .25s;}
+
+/* ── GEM-CUT 3D ICONS ── */
+.gem{width:24px;height:24px;position:relative;transition:all .25s;
+  filter:drop-shadow(0 0 0 transparent);}
+.gem.g-home{width:20px;height:20px;border-radius:50%;
+  background:var(--sphere-grad);
+  box-shadow:inset -2px -2px 6px rgba(0,0,0,0.6),inset 2px 2px 6px rgba(255,255,255,0.3);}
+.gem.g-orbit{width:18px;height:18px;transform:rotate(45deg);border-radius:3px;
+  background:var(--diamond-grad);
+  box-shadow:inset -2px -2px 6px rgba(0,0,0,0.55),inset 2px 2px 6px rgba(255,255,255,0.3);}
+.gem.g-pulse{width:24px;height:16px;border-radius:8px;
+  background:linear-gradient(180deg,#FCEABB 0%,#D4AF37 45%,#A67B1E 100%);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,0.4),inset 0 -2px 4px rgba(0,0,0,0.5);}
+.gem.g-ring{width:20px;height:20px;border-radius:50%;
+  background:conic-gradient(from 225deg,#FFF8E1,#D4AF37,#8B6914,#D4AF37,#FFF8E1);
+  -webkit-mask:radial-gradient(circle,transparent 5px,#000 6px);
+  mask:radial-gradient(circle,transparent 5px,#000 6px);}
+.nav-item .gem{opacity:.4;transition:all .25s;}
+.nav-item.active .gem{opacity:1;filter:drop-shadow(0 0 6px var(--amber));transform:translateY(-2px);}
+.nav-item:active .gem{transform:scale(0.90);
+  box-shadow:inset 0 0 12px rgba(0,0,0,0.8);}
+.nav-item.active .nav-label{color:var(--amber);}
+
+/* ── CELESTIAL LINE ICONS (alt) ── */
+.cel{width:22px;height:22px;display:none;}
+.cel svg{width:22px;height:22px;stroke:rgba(255,255,255,0.5);fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;transition:all .25s;}
+.nav-item.active .cel svg{stroke:var(--amber);fill:var(--amber);
+  filter:drop-shadow(0 0 6px var(--amber));}
+.nav-item:active .cel svg{transform:scale(0.90);}
+body.show-cel .gem{display:none;}
+body.show-cel .cel{display:block;}
+
+/* ═══ ICON SHOWCASE ═══ */
+.icon-showcase{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin:24px 0;}
+.icon-card{width:150px;text-align:center;padding:24px 16px;cursor:pointer;transition:all .3s;}
+.icon-card:hover{transform:translateY(-4px);background:rgba(255,255,255,0.04);}
+.icon-preview{width:64px;height:64px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;}
+.icon-name{font-size:11px;font-weight:500;color:var(--fluor);letter-spacing:1px;margin-bottom:4px;}
+.icon-desc{font-size:9px;color:var(--fluor-dim);line-height:1.5;}
+.gem-lg{width:48px;height:48px;}
+.gem-lg.g-home{border-radius:50%;}
+.gem-lg.g-orbit{transform:rotate(45deg);border-radius:6px;}
+.gem-lg.g-pulse{width:56px;height:36px;border-radius:18px;}
+.gem-lg.g-ring{width:48px;height:48px;}
+
+/* Micro-interaction demo */
+.showcase-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:900px){.showcase-grid{grid-template-columns:1fr;}.desktop-mock{grid-template-columns:1fr;}.sidebar{display:none;}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+</style>
+</head>
+<body>
+<div id="nebula"></div>
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div class="vintage-title">Vintage</div>
+    <div style="font-size:9px;color:var(--fluor-dim);letter-spacing:2px;">V5 FINAL · 2026.07.30</div>
+  </div>
+
+  <div class="switcher">
+    <button class="sw-btn active" onclick="setNavStyle('gem')" id="btnGem">BOTTOM NAV · GEM 3D</button>
+    <button class="sw-btn" onclick="setNavStyle('cel')" id="btnCel">BOTTOM NAV · CELESTIAL LINE</button>
+  </div>
+
+  <!-- 00 · APP ICON — Gem-cut 3D -->
+  <div class="section-title">00 · App Icon <span class="ver-tag">Gem-Cut 3D</span></div>
+  <div class="icon-showcase">
+    <div class="icon-card glass" style="outline:2px solid var(--amber);outline-offset:4px;border-radius:var(--radius);">
+      <div class="icon-preview">
+        <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="gA" cx="32%" cy="28%" r="70%"><stop offset="0%" stop-color="#FFF8E1"/><stop offset="55%" stop-color="#D4AF37"/><stop offset="100%" stop-color="#8B6914"/></radialGradient>
+            <radialGradient id="gB" cx="32%" cy="28%" r="70%"><stop offset="0%" stop-color="#FCEABB"/><stop offset="50%" stop-color="#D4AF37"/><stop offset="100%" stop-color="#A67B1E"/></radialGradient>
+            <filter id="gg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- ring back -->
+          <ellipse cx="48" cy="58" rx="36" ry="10" fill="none" stroke="rgba(212,175,55,0.35)" stroke-width="1.2" transform="rotate(-12 48 58)" filter="url(#gg)"/>
+          <!-- gem sphere planet -->
+          <circle cx="46" cy="46" r="27" fill="url(#gA)"/>
+          <ellipse cx="40" cy="40" rx="6" ry="4" fill="rgba(255,255,255,0.45)" opacity="0.7" transform="rotate(-20 40 40)"/>
+          <!-- ring front -->
+          <ellipse cx="48" cy="58" rx="36" ry="10" fill="none" stroke="rgba(212,175,55,0.7)" stroke-width="1.6" transform="rotate(-12 48 58)" stroke-dasharray="62 8" filter="url(#gg)"/>
+          <ellipse cx="48" cy="58" rx="33" ry="7" fill="none" stroke="rgba(255,215,0,0.15)" stroke-width="3" transform="rotate(-12 48 58)"/>
+        </svg>
+      </div>
+      <div class="icon-name">AMBER GEM PLANET</div>
+      <div class="icon-desc">球体径向金属渐变 + 星环发光<br/>V5 主推方案 ★</div>
+    </div>
+    <div class="icon-card glass">
+      <div class="icon-preview">
+        <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="gC" cx="32%" cy="28%" r="70%"><stop offset="0%" stop-color="#E8F0FE"/><stop offset="55%" stop-color="#3A506B"/><stop offset="100%" stop-color="#1F2833"/></radialGradient></defs>
+          <ellipse cx="48" cy="58" rx="36" ry="10" fill="none" stroke="rgba(108,99,255,0.5)" stroke-width="1.4" transform="rotate(-12 48 58)"/>
+          <circle cx="46" cy="46" r="27" fill="url(#gC)"/>
+          <ellipse cx="40" cy="40" rx="6" ry="4" fill="rgba(255,255,255,0.5)" transform="rotate(-20 40 40)"/>
+          <ellipse cx="48" cy="58" rx="36" ry="10" fill="none" stroke="rgba(108,99,255,0.7)" stroke-width="1.6" transform="rotate(-12 48 58)" stroke-dasharray="62 8"/>
+        </svg>
+      </div>
+      <div class="icon-name">DEEP SPACE BLUE</div>
+      <div class="icon-desc">蓝紫星环 + 冷调球体<br/>备选配色</div>
+    </div>
+    <div class="icon-card glass">
+      <div class="icon-preview">
+        <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="gD" cx="32%" cy="28%" r="70%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="50%" stop-color="#9CA3AF"/><stop offset="100%" stop-color="#374151"/></radialGradient></defs>
+          <ellipse cx="48" cy="58" rx="36" ry="10" fill="none" stroke="rgba(156,163,175,0.5)" stroke-width="1.4" transform="rotate(-12 48 58)"/>
+          <circle cx="46" cy="46" r="27" fill="url(#gD)"/>
+          <ellipse cx="40" cy="40" rx="6" ry="4" fill="rgba(255,255,255,0.55)" transform="rotate(-20 40 40)"/>
+          <ellipse cx="48" cy="58" rx="36" ry="10" fill="none" stroke="rgba(156,163,175,0.7)" stroke-width="1.6" transform="rotate(-12 48 58)" stroke-dasharray="62 8"/>
+        </svg>
+      </div>
+      <div class="icon-name">METEORITE GRAY</div>
+      <div class="icon-desc">陨石灰调金属球体<br/>暗色偏好备选</div>
+    </div>
+  </div>
+
+  <!-- 01 · Desktop -->
+  <div class="section-title">01 · Desktop Layout <span class="ver-tag">Glass v5</span></div>
+  <div class="desktop-mock glass">
+    <div class="sidebar">
+      <div class="sidebar-header"><div class="vintage-title" style="font-size:22pt;">Vintage</div></div>
+      <div class="sidebar-menu">
+        <div class="sb-item active"><div class="sel-bar"></div>
+          <svg class="sb-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span class="sb-label">Study Project</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><hr class="dot-div">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="sb-label">Private Info</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><hr class="dot-div">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 0 0-8 0v2"/><path d="M12 14v3"/></svg>
+          <span class="sb-label">Job Content</span>
+        </div><div class="arc-line">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span class="sb-label">AI Skill</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><hr class="dot-div">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 3 0 0 1 4 10 15 3 0 0 1-4 10 15 3 0 0 1-4-10 15 3 0 0 1 4-10z"/></svg>
+          <span class="sb-label">EUR trvl</span>
+        </div><hr class="dot-div">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M12 8c-1 1.5-1 3.5 0 5s1 3.5 0 5"/><path d="M9 9l6 6M9 15l6-6"/></svg>
+          <span class="sb-label">Korea Language</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><hr class="dot-div">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><rect x="2" y="3" width="9" height="9"/><line x1="2" y1="13.5" x2="22" y2="13.5"/><line x1="2" y1="16" x2="22" y2="16"/><line x1="2" y1="18.5" x2="22" y2="18.5"/></svg>
+          <span class="sb-label">USA Language</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><div class="arc-line">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><polygon points="10 8 16 12 10 16" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span class="sb-label">Movie</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><hr class="dot-div">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="sb-label">Book</span>
+          <span class="orbit-dot"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/><circle cx="7" cy="2" r="1.2" fill="currentColor" opacity="0.6"/></svg></span>
+        </div><div class="arc-line">
+        <div class="sb-item">
+          <svg class="sb-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span class="sb-label">時政及金融筆記匯總</span>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="top-bar glass">
+        <div class="vintage-title" style="font-size:20pt;">Vintage</div>
+        <div class="orbit-ring" style="--p:68;"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text"><span class="cnt" data-to="68">0</span>%</div></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card glass bounce-tap sweep-wrap" id="sc1">
+          <div class="si">🎓</div>
+          <div class="stat-info"><h4>Study</h4><div class="val"><span class="cnt" data-to="205">0</span>m</div></div>
+          <div class="orbit-ring" style="--p:72;"><svg width="40" height="40" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text"><span class="cnt" data-to="72">0</span>%</div></div>
+        </div>
+        <div class="stat-card glass bounce-tap">
+          <div class="si">🗝️</div>
+          <div class="stat-info"><h4>Private</h4><div class="val"><span class="cnt" data-to="5">0</span> tasks</div></div>
+          <div class="orbit-ring" style="--p:40;"><svg width="40" height="40" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text"><span class="cnt" data-to="40">0</span>%</div></div>
+        </div>
+        <div class="stat-card glass bounce-tap">
+          <div class="si">💼</div>
+          <div class="stat-info"><h4>Job</h4><div class="val">Wk32</div></div>
+          <div class="orbit-ring" style="--p:85;"><svg width="40" height="40" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text"><span class="cnt" data-to="85">0</span>%</div></div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="panel glass">
+          <h3>🎓 Study Project</h3>
+          <ul class="todo-list">
+            <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text">React 高级模式源码阅读</span><span class="ti-badge">🖼 3</span></li>
+            <li class="ti" onclick="toggleCheck(this)"><div class="chk checked"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text done">TypeScript 泛型约束笔记</span><span class="ti-badge">🖼 1</span></li>
+            <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text">Rust 所有权机制练习</span><span class="ti-badge">🖼 0</span><span class="ti-badge">🔗</span></li>
+            <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text">系统设计：分布式缓存</span><span class="ti-badge">🖼 2</span></li>
+          </ul>
+        </div>
+        <div class="panel glass">
+          <h3>🇰🇷 Korea Language · Check-in</h3>
+          <div style="font-size:10px;color:var(--fluor-dim);margin-bottom:10px;letter-spacing:1px;">JULY 2026 · WEEK GRID</div>
+          <div class="cal-grid">
+            <div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div>
+            <div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day done" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day today" onclick="burst(this,event)"></div>
+            <div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div>
+            <div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div><div class="cal-day" onclick="burst(this,event)"></div>
+          </div>
+          <div style="display:flex;gap:16px;margin-top:14px;font-size:9px;color:var(--fluor-dim);">
+            <span>● done</span><span>○ pending</span><span>◎ today</span></div>
+        </div>
+        <div class="panel glass">
+          <h3>🗺️ EUR trvl · Destinations</h3>
+          <div class="city-card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="city-name">PARIS</div><div class="city-meta">Jul 15–22 · 7d · 12 items</div></div><div class="orbit-ring" style="--p:35;width:36px;height:36px;"><svg width="36" height="36" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg></div></div></div>
+          <div class="city-card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="city-name">ZÜRICH</div><div class="city-meta">Jul 23–27 · 4d</div></div><div class="orbit-ring" style="--p:0;width:36px;height:36px;"><svg width="36" height="36" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg></div></div></div>
+          <div class="city-card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="city-name">ROMA</div><div class="city-meta">Jul 28–Aug 2 · 5d</div></div><div class="orbit-ring" style="--p:0;width:36px;height:36px;"><svg width="36" height="36" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg></div></div></div>
+        </div>
+        <div class="panel glass">
+          <h3>📜 時政及金融筆記匯總</h3>
+          <div class="note-item"><div class="note-title">美联储 7 月议息会议纪要</div><div class="note-date">2026-07-29 · 🖼 2</div></div>
+          <div class="note-item"><div class="note-title">A股半年报核心数据整理</div><div class="note-date">2026-07-28 · 🖼 5 · 🔗 3</div></div>
+          <div class="note-item"><div class="note-title">欧洲能源政策跟踪</div><div class="note-date">2026-07-25 · 🖼 1</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 · Login -->
+  <div class="section-title">02 · Login <span class="ver-tag">ENTER STARPORT</span></div>
+  <div class="login-mock glass">
+    <div class="login-title-v vintage-title">Vintage</div>
+    <div class="login-sub">ENTER STARPORT</div>
+    <div class="login-tabs"><div class="ltab active">Email</div><div class="ltab">Phone</div></div>
+    <input class="linput" placeholder="your@email.com">
+    <input class="linput" type="password" placeholder="Password">
+    <button class="lbtn" onclick="this.closest('.login-mock').classList.add('sweeping');setTimeout(()=>this.closest('.login-mock').classList.remove('sweeping'),700)">ENTER STARPORT</button>
+    <div class="llinks"><span>Forgot password?</span> &nbsp;·&nbsp; <span>Create account</span></div>
+  </div>
+
+  <!-- 03 · Mobile -->
+  <div class="section-title">03 · Mobile <span class="ver-tag">Gem 3D Nav · Z-Depth</span></div>
+  <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;">
+    <div class="mobile-frame glass">
+      <div class="mobile-notch"></div>
+      <div class="mobile-inner">
+        <div class="mobile-hdr"><div class="vintage-title" style="font-size:24pt;">Vintage</div>
+          <div style="font-size:9px;color:var(--fluor-dim);letter-spacing:2px;margin-top:2px;">JUL 30 · WED</div></div>
+        <div class="mobile-cards">
+          <div class="mcard glass primary">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:1px;">Today's Plan</span>
+              <div class="orbit-ring" style="--p:45;width:36px;height:36px;"><svg width="36" height="36" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg></div>
+            </div>
+            <ul class="todo-list">
+              <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text" style="font-size:11px;">Korean vocabulary 30</span></li>
+              <li class="ti" onclick="toggleCheck(this)"><div class="chk checked"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text done" style="font-size:11px;">Read Fed minutes</span></li>
+              <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text" style="font-size:11px;">Paris D1 planning</span></li>
+            </ul>
+          </div>
+          <div class="mcard glass secondary">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:1px;color:var(--fluor-dim);">🇰🇷 Korean</span>
+              <span style="font-size:10px;color:var(--amber);">9/12 days</span></div>
+            <div class="cal-grid" style="margin-top:8px;gap:3px;">
+              <div class="cal-day done" style="font-size:8px;" onclick="burst(this,event)"></div><div class="cal-day done" style="font-size:8px;" onclick="burst(this,event)"></div><div class="cal-day done" style="font-size:8px;" onclick="burst(this,event)"></div><div class="cal-day done" style="font-size:8px;" onclick="burst(this,event)"></div><div class="cal-day done" style="font-size:8px;" onclick="burst(this,event)"></div><div class="cal-day" style="font-size:8px;"></div><div class="cal-day today" style="font-size:8px;" onclick="burst(this,event)"></div>
+            </div>
+          </div>
+          <div class="mcard glass secondary">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:1px;color:var(--fluor-dim);">📚 Notes</span>
+              <span style="font-size:9px;color:var(--fluor-dim);">3 notes</span></div>
+            <div class="note-item" style="padding:8px 0;margin:0;"><div class="note-title" style="font-size:11px;">Fed rate notes</div><div class="note-date">Today, 09:30</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Bottom nav -->
+      <div class="mob-nav">
+        <div class="nav-items" id="navItems">
+          <div class="nav-item active" onclick="setNav(this,'home')">
+            <!-- gem -->
+            <div class="gem g-home" data-tilt></div>
+            <!-- celestial alt -->
+            <div class="cel"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="11" ry="4.5" transform="rotate(-20 12 12)"/></svg></div>
+            <span class="nav-label">Home</span>
+          </div>
+          <div class="nav-item" onclick="setNav(this,'orbit')">
+            <div class="gem g-orbit" data-tilt></div>
+            <div class="cel"><svg viewBox="0 0 24 24"><path d="M4 18c5-2 9-7 13-14"/><circle cx="17" cy="6" r="1"/><circle cx="14" cy="9" r="0.8"/><circle cx="11" cy="12" r="0.6"/></svg></div>
+            <span class="nav-label">Orbit</span>
+          </div>
+          <div class="nav-item" onclick="setNav(this,'pulse')">
+            <div class="gem g-pulse" data-tilt></div>
+            <div class="cel"><svg viewBox="0 0 24 24"><polygon points="6 8 12 12 6 16"/><polygon points="18 8 12 12 18 16"/><line x1="12" y1="3" x2="12" y2="21"/></svg></div>
+            <span class="nav-label">Pulse</span>
+          </div>
+          <div class="nav-item" onclick="setNav(this,'ring')">
+            <div class="gem g-ring" data-tilt></div>
+            <div class="cel"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="4" transform="rotate(-25 12 12)"/></svg></div>
+            <span class="nav-label">Ring</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 · Micro-interactions -->
+  <div class="section-title">04 · Interactions <span class="ver-tag">Try clicking</span></div>
+  <div class="showcase-grid">
+    <div class="panel glass">
+      <h3>☑️ Gold Particle Splash (0.5s)</h3>
+      <p style="font-size:10px;color:var(--fluor-dim);margin-bottom:14px;line-height:1.6;">Click checkbox → 8–12 gold squares/circles spray out and vanish.</p>
+      <ul class="todo-list">
+        <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text">Click → gold splash</span></li>
+        <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text">Click → another splash</span></li>
+        <li class="ti" onclick="toggleCheck(this)"><div class="chk"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="ti-text">Click → third splash</span></li>
+      </ul>
+    </div>
+    <div class="panel glass">
+      <h3>🪐 Orbit Ring + Count-up</h3>
+      <p style="font-size:10px;color:var(--fluor-dim);margin-bottom:14px;line-height:1.6;">Click ring → +10% with count-up number animation.</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;padding:10px 0;">
+        <div style="text-align:center;cursor:pointer;" onclick="boostRing(this,10)">
+          <div class="orbit-ring" style="--p:25;width:64px;height:64px;"><svg width="64" height="64" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text" style="font-size:10px;"><span class="cnt" data-to="25">0</span>%</div></div>
+          <div style="font-size:9px;color:var(--fluor-dim);margin-top:4px;">Study</div>
+        </div>
+        <div style="text-align:center;cursor:pointer;" onclick="boostRing(this,10)">
+          <div class="orbit-ring" style="--p:62;width:64px;height:64px;"><svg width="64" height="64" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text" style="font-size:10px;"><span class="cnt" data-to="62">0</span>%</div></div>
+          <div style="font-size:9px;color:var(--fluor-dim);margin-top:4px;">Travel</div>
+        </div>
+        <div style="text-align:center;cursor:pointer;" onclick="boostRing(this,10)">
+          <div class="orbit-ring" style="--p:88;width:64px;height:64px;"><svg width="64" height="64" viewBox="0 0 44 44"><circle class="ot" cx="22" cy="22" r="20"/><circle class="of" cx="22" cy="22" r="20"/></svg><div class="orbit-text" style="font-size:10px;"><span class="cnt" data-to="88">0</span>%</div></div>
+          <div style="font-size:9px;color:var(--fluor-dim);margin-top:4px;">Job</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:40px 0 20px;font-size:9px;color:rgba(255,255,255,0.15);letter-spacing:2px;">
+    VINTAGE V5 FINAL SPEC · SPACE AGE RETRO · © 2026
+  </div>
+</div>
+
+<script>
+/* ═══ INTERACTIONS ═══ */
+
+// Checkbox + gold particle splash 0.5s
+function toggleCheck(el){
+  const chk=el.querySelector('.chk'); const txt=el.querySelector('.ti-text');
+  const checking=!chk.classList.contains('checked');
+  chk.classList.toggle('checked'); txt.classList.toggle('done');
+  if(checking){
+    splash(chk);
+    const panel=el.closest('.panel,.mcard');
+    if(panel){panel.classList.add('sweeping');setTimeout(()=>panel.classList.remove('sweeping'),700);}
+  }
+}
+// Gold particle splash: 8-12 squares/circles
+function splash(el){
+  const rect=el.getBoundingClientRect(); const cx=rect.width/2,cy=rect.height/2;
+  const n=8+Math.floor(Math.random()*5);
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div'); p.className='particle';
+    if(Math.random()>0.5)p.style.borderRadius='50%';
+    const ang=Math.PI*2*i/n+Math.random()*0.6; const dist=18+Math.random()*28;
+    p.style.setProperty('--tx',Math.cos(ang)*dist+'px');
+    p.style.setProperty('--ty',Math.sin(ang)*dist+'px');
+    p.style.left=cx+'px'; p.style.top=cy+'px';
+    const sz=3+Math.random()*3; p.style.width=sz+'px'; p.style.height=sz+'px';
+    p.style.animation=`splash .5s ease-out forwards`;
+    el.appendChild(p); setTimeout(()=>p.remove(),520);
+  }
+}
+// inject keyframe
+const sty=document.createElement('style');
+sty.textContent=`@keyframes splash{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.3);}}`;
+document.head.appendChild(sty);
+
+// Calendar day
+function burst(el,e){
+  if(el.classList.contains('done')||el.classList.contains('today'))return;
+  el.classList.add('done');
+  const rect=el.getBoundingClientRect(); const cx=rect.width/2,cy=rect.height/2;
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div'); p.className='particle';
+    const ang=Math.PI*2*i/8; const dist=14+Math.random()*14;
+    p.style.setProperty('--tx',Math.cos(ang)*dist+'px'); p.style.setProperty('--ty',Math.sin(ang)*dist+'px');
+    p.style.left=cx+'px'; p.style.top=cy+'px';
+    p.style.animation=`splash .5s ease-out forwards`; el.appendChild(p); setTimeout(()=>p.remove(),520);
+  }
+}
+
+// Orbit ring boost + count-up
+function boostRing(el,amt){
+  const ring=el.querySelector('.orbit-ring'); const txt=el.querySelector('.cnt');
+  let cur=parseInt(ring.style.getPropertyValue('--p'))||0;
+  cur=Math.min(100,cur+amt); ring.style.setProperty('--p',cur);
+  countUp(txt,cur);
+}
+// Count-up animation
+function countUp(el,to){
+  const from=parseInt(el.textContent)||0; const dur=600; const t0=performance.now();
+  function step(t){const k=Math.min(1,(t-t0)/dur);const v=Math.round(from+(to-from)*k);
+    el.textContent=v; if(k<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+// Auto count-up on load for .cnt elements
+window.addEventListener('load',()=>{
+  document.querySelectorAll('.cnt').forEach(el=>{const to=parseInt(el.dataset.to);countUp(el,to);});
+});
+
+// Nav style toggle
+function setNavStyle(s){
+  document.body.classList.toggle('show-cel',s==='cel');
+  document.getElementById('btnGem').classList.toggle('active',s==='gem');
+  document.getElementById('btnCel').classList.toggle('active',s==='cel');
+}
+// Nav select
+function setNav(el){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
+
+// Gyroscope tilt simulation (desktop: map mouse; real phone: DeviceOrientation)
+function applyTilt(x,y){
+  document.querySelectorAll('[data-tilt]').forEach(g=>{
+    g.style.boxShadow=`inset calc(${-x*2}px) calc(${-y*2}px) 6px rgba(0,0,0,0.6), inset calc(${x*2}px) calc(${y*2}px) 6px rgba(255,255,255,0.3)`;
+  });
+}
+document.addEventListener('mousemove',e=>{
+  const x=(e.clientX/window.innerWidth-0.5)*2, y=(e.clientY/window.innerHeight-0.5)*2;
+  applyTilt(x,y);
+  // Parallax nebula drift
+  document.getElementById('nebula').style.transform=`translate(${x*20}px,${y*20}px)`;
+});
+// Real gyroscope on mobile
+if(window.DeviceOrientationEvent){
+  window.addEventListener('deviceorientation',e=>{
+    const x=(e.gamma||0)/45, y=(e.beta||0)/45;
+    applyTilt(Math.max(-1,Math.min(1,x)),Math.max(-1,Math.min(1,y)));
+  });
+}
+</script>
+</body>
+</html>
