@@ -154,13 +154,19 @@ function serveStatic(req, res, pathname) {
       // SPA 兜底：未知路径回 index.html
       fs.readFile(path.join(APP_DIR, 'index.html'), (e2, idx) => {
         if (e2) { res.writeHead(404); return res.end('not found'); }
-        res.writeHead(200, { 'Content-Type': MIME['.html'] });
+        res.writeHead(200, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-cache, must-revalidate' });
         res.end(idx);
       });
       return;
     }
     const ext = path.extname(file).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+    /* 缓存策略：应用外壳（html/css/js/manifest）每次校验，避免发布后仍拿到旧版本；
+       图标等不可变资源长缓存 */
+    const shell = ['.html', '.css', '.js', '.json', '.webmanifest'].includes(ext);
+    res.writeHead(200, {
+      'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Cache-Control': shell ? 'no-cache, must-revalidate' : 'public, max-age=604800'
+    });
     res.end(buf);
   });
 }

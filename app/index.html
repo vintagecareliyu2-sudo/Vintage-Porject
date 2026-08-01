@@ -7,7 +7,9 @@
 <title>Vintage</title>
 <!-- 可选：强制指定云端同步地址，例如 <script>window.VINTAGE_SYNC_URL='https://你的域名'</script> -->
 <script>window.VINTAGE_SYNC_URL = '';</script>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=3">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Vintage">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Vintage">
@@ -16,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/app.css?v=3">
 </head>
 <body>
 <canvas id="stars"></canvas>
@@ -87,11 +89,11 @@
 <!-- Toast -->
 <div id="toast"></div>
 
-<script src="js/sync.js"></script>
-<script src="js/store.js"></script>
-<script src="js/fx.js"></script>
-<script src="js/views.js"></script>
-<script src="js/views2.js"></script>
-<script src="js/app.js"></script>
+<script src="js/sync.js?v=3"></script>
+<script src="js/store.js?v=3"></script>
+<script src="js/fx.js?v=3"></script>
+<script src="js/views.js?v=3"></script>
+<script src="js/views2.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
 </body>
 </html>

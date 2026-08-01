@@ -49,8 +49,38 @@ const Store = (() => {
     };
   }
 
+  /* Job 工作事项：统一字段（新旧数据都走这里补齐） */
+  function jobItem(o) {
+    o = o || {};
+    const title = o.title || o.text || '';
+    return {
+      id: o.id || uid(),
+      text: title,                                   /* 兼容旧字段 */
+      title,
+      done: !!o.done,
+      desc: o.desc || '',
+      contact: o.contact || '',
+      priority: [1, 2, 3].includes(Number(o.priority)) ? Number(o.priority) : 2,
+      stage: Math.max(0, Math.min(100, Number(o.stage) || 0)),
+      deadline: o.deadline || '',
+      category: o.category || '其他',
+      createdAt: o.createdAt || Date.now(),
+      doneAt: o.doneAt || 0
+    };
+  }
+
   function seed(d) {
     const t = (title) => ({ id: uid(), title, done: false, images: [], note: '', logs: [] });
+    const day = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+    d.job.todo.push(
+      jobItem({ title: '完成 Q3 产品需求评审文档', desc: '整理需求清单，输出评审稿并同步至团队。', contact: '张明', priority: 1, stage: 60, deadline: day(2), category: '文档' }),
+      jobItem({ title: '前端登录模块联调', desc: '与后端确认 token 刷新逻辑。', contact: '李工', priority: 2, stage: 25, deadline: day(5), category: '开发' })
+    );
+    d.job.done.push(
+      jobItem({ title: '周一晨会汇报', desc: '同步上周进度与本周计划。', contact: '王经理', priority: 2, stage: 100, category: '会议', done: true, doneAt: Date.now() })
+    );
+    d.job.block.push(jobItem({ title: '测试环境数据库连接不稳定', category: '开发', priority: 1 }));
+    d.job.improve.push(jobItem({ title: '每日下班前 10 分钟复盘当天进度', category: '其他', priority: 3 }));
     d.movie.movies.push({ id: uid(), title: '星际穿越', director: '克里斯托弗·诺兰', country: '美国/英国', watchDate: '', progress: 60, rating: 5, watched: false, ticketImg: '', reminder: '', note: '', images: [] });
     d.book.books.push({ id: uid(), title: '置身事内', author: '兰小欢', pageTotal: 302, pageCurrent: 45, progress: 15, finished: false, review: '', images: [], startDate: new Date().toISOString().slice(0,10), finishDate: '' });
     d.ai.prompts.push({ id: uid(), title: '英语翻译助手', body: '你是一位专业翻译，请将以下中文翻译为自然流畅的英文，保持原文语气和风格。', created: Date.now() });
@@ -170,6 +200,12 @@ const Store = (() => {
     if (!_data.study.pomo.daySec) _data.study.pomo.daySec = {};
     if (!_data.profile) _data.profile = { name: '', avatar: '' };
     if (!_data.custom) _data.custom = {};
+    /* 迁移：Job 旧结构 {id,text,done} → 增强字段 */
+    if (!_data.job) _data.job = def.job;
+    ['todo', 'done', 'block', 'improve'].forEach(k => {
+      if (!Array.isArray(_data.job[k])) _data.job[k] = [];
+      _data.job[k] = _data.job[k].map(jobItem);
+    });
     /* 迁移：旧版按任务记录的番茄钟时长并入累计 */
     if (!_data.study.pomo.migrated) {
       const oldMin = (_data.study.tasks || []).reduce((s, t) => s + (t.logs || []).reduce((a, l) => a + (l.min || 0), 0), 0);
@@ -231,5 +267,5 @@ const Store = (() => {
   }
 
   return { uid, register, login, resetPass, session, current, logout, data, save, applyRemote,
-           resizeImage, exportData, importData, updateProfile, listAccounts, persistent };
+           resizeImage, exportData, importData, updateProfile, listAccounts, persistent, jobItem };
 })();

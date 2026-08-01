@@ -331,8 +331,91 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 /* Study preset selector */
 #ginput[style*="width:auto"] { flex: none; }
 
+/* ═══════════ Job Content · 工作事项管理 ═══════════ */
+.job-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.js-cell{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.js-n{font-size:20px;font-weight:600;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.js-n.warn{background:none;-webkit-text-fill-color:#e08f8f;color:#e08f8f}
+.js-l{font-size:10.5px;letter-spacing:1px;color:var(--txt3)}
+
+.job-bar{display:flex;align-items:center;gap:10px;margin:18px 0 10px}
+.job-sec-t{display:flex;align-items:center;gap:7px;font-size:12.5px;letter-spacing:1px;color:var(--txt2)}
+.job-sec-t .dot,.job-sec h4 .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.job-bar .add-btn{margin-left:auto;padding:9px 16px}
+
+.job-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.job-card{padding:14px 15px;display:flex;flex-direction:column;gap:9px;transition:border-color .3s var(--drag)}
+.job-card:hover{border-color:rgba(212,175,55,0.24)}
+.jc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.jc-prio{font-size:10px;padding:2px 7px;border-radius:6px;border:1px solid;white-space:nowrap}
+.jc-title{flex:1;min-width:120px;font-size:14px;font-weight:600;color:var(--txt);line-height:1.4}
+.jc-cat{font-size:10px;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--txt2);white-space:nowrap}
+.jc-desc{font-size:12px;line-height:1.6;color:var(--txt2);white-space:pre-wrap;word-break:break-word}
+.jc-meta{display:flex;flex-wrap:wrap;gap:7px}
+.jc-tag{font-size:10.5px;padding:3px 8px;border-radius:7px;background:rgba(255,255,255,0.045);border:1px solid var(--glass-bd);color:var(--txt2);white-space:nowrap}
+.jc-tag.soon{color:var(--gold);border-color:rgba(212,175,55,0.4)}
+.jc-tag.over{color:#e08f8f;border-color:rgba(224,143,143,0.45)}
+.jc-prog{display:flex;align-items:center;gap:9px}
+.jc-bar{flex:1;height:6px}
+.jc-pct{font-size:11px;color:var(--gold);min-width:34px;text-align:right}
+.jc-stages{display:flex;gap:5px}
+.jc-stage{flex:1;padding:5px 0;border-radius:7px;border:1px solid var(--glass-bd);background:rgba(255,255,255,0.03);color:var(--txt3);font-size:10px;cursor:pointer;font-family:inherit;transition:all .25s var(--spring)}
+.jc-stage:active{transform:scale(0.94)}
+.jc-stage.on{background:rgba(212,175,55,0.15);border-color:rgba(212,175,55,0.4);color:var(--gold)}
+.jc-acts{display:flex;gap:7px;margin-top:1px}
+.jc-btn{flex:1;padding:8px 0;border-radius:9px;border:1px solid var(--glass-bd);background:var(--glass);color:var(--txt2);font-size:11.5px;cursor:pointer;font-family:inherit}
+.jc-btn.ok{background:rgba(143,212,154,0.12);border-color:rgba(143,212,154,0.32);color:#8fd49a}
+.jc-btn.del{flex:none;padding:8px 12px;color:var(--txt3)}
+.jc-btn.del:hover{color:#e08f8f;border-color:rgba(224,143,143,0.4)}
+.job-card.done{opacity:.82}
+.job-card.done .jc-title{color:var(--txt2);text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.25)}
+.jc-done-ico{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;background:rgba(143,212,154,0.16);color:#8fd49a;flex:none}
+
+/* 问题与阻碍 / 下周改进 */
+.job-notes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.job-sec{padding:16px}
+.job-sec h4{font-size:12.5px;letter-spacing:1px;margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.jc-count{margin-left:auto;font-size:10px;color:var(--txt3)}
+.jn-item{display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px dotted rgba(255,255,255,0.08);font-size:12.5px}
+.jn-cat{font-size:9.5px;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,0.06);color:var(--txt3);flex:none}
+.jn-text{flex:1;min-width:0;word-break:break-word}
+.jn-add{display:flex;gap:6px;margin-top:10px}
+.jn-add .ginput{margin-bottom:0;flex:1;padding:8px 11px;font-size:12px}
+.jn-add .jn-cat-sel{flex:none;width:78px;padding:8px 6px}
+.jn-add .add-btn{padding:0 14px}
+
+/* 事项表单弹窗 */
+.jf-mask{position:fixed;inset:0;z-index:90;background:rgba(4,7,14,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:jfIn .25s var(--drag)}
+@keyframes jfIn{from{opacity:0}to{opacity:1}}
+.jf-panel{width:100%;max-width:480px;max-height:86vh;overflow-y:auto;padding:22px;background:rgba(17,27,45,0.92);animation:jfUp .35s var(--spring)}
+@keyframes jfUp{from{transform:translateY(18px) scale(0.98);opacity:0}to{transform:none;opacity:1}}
+.jf-head{font-size:15px;font-weight:600;letter-spacing:1px;margin-bottom:16px;color:var(--txt)}
+.jf-lab{display:block;font-size:11px;letter-spacing:1px;color:var(--txt3);margin-bottom:6px}
+.jf-req{color:var(--gold)}
+.jf-area{min-height:76px;resize:vertical;line-height:1.6}
+.jf-row{display:flex;gap:10px}
+.jf-col{flex:1;min-width:0}
+.jf-msg{min-height:16px;font-size:11.5px;color:#e08f8f;margin:8px 0 4px}
+.jf-btns{display:flex;gap:10px;margin-top:6px}
+.jf-btns .d-btn{padding:11px 18px}
+.jf-btns .add-btn{padding:11px 0}
+.jf-panel select.ginput,.jn-cat-sel{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--txt3) 50%),linear-gradient(135deg,var(--txt3) 50%,transparent 50%);background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.jf-panel option,.jn-cat-sel option{background:#111B2D;color:var(--txt)}
+
+/* PWA 安装引导 */
+.pwa-tip{font-size:12px;line-height:1.9;color:var(--txt2)}
+.pwa-tip b{color:var(--gold);font-weight:600}
+
 /* ═══════════ 手机端 ═══════════ */
 @media (max-width:880px){
+  .job-stats{grid-template-columns:1fr 1fr}
+  .job-list,.job-notes{grid-template-columns:1fr}
+  .job-bar{flex-wrap:wrap}
+  .job-bar .add-btn{padding:9px 14px;font-size:12px}
+  .jc-title{min-width:0;font-size:13.5px}
+  .jc-stage{font-size:9.5px}
+  .jf-panel{max-height:88vh;padding:18px}
+  .jf-row{flex-direction:column;gap:0}
   #sidebar{display:none}
   #bottom-nav{display:flex}
   #main{padding:22px 16px calc(86px + env(safe-area-inset-bottom))}

@@ -192,6 +192,34 @@ function enterApp() {
   route();
 }
 
+/* ── PWA 安装引导 ── */
+let _installPrompt = null;
+function initInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _installPrompt = e;
+    /* 在侧边栏底部显示安装按钮（如果尚未安装） */
+    const btn = document.createElement('button');
+    btn.id = 'pwa-install';
+    btn.className = 'mini-btn press';
+    btn.textContent = '安装 App';
+    btn.onclick = () => {
+      if (_installPrompt) { _installPrompt.prompt(); _installPrompt.userChoice.then(() => { _installPrompt = null; btn.remove(); }); }
+      else showInstallFallback();
+    };
+  });
+}
+function showInstallFallback() {
+  const tip = `<div class="glass" style="padding:18px;max-width:360px;margin:20px auto">
+    <div style="font-weight:600;margin-bottom:10px">安装 Vintage 到手机桌面</div>
+    <div class="pwa-tip">
+      <b>Chrome / Edge：</b>点击地址栏右侧的「安装」图标<br>
+      <b>QQ 浏览器 / UC / 360：</b>打开菜单 → 「添加到主屏幕」或「添加到桌面」<br>
+      <b>微信内置浏览器：</b>点击右上角「…」→「在浏览器中打开」，再按上述步骤操作
+    </div></div>`;
+  $m().innerHTML = tip + ($m().innerHTML || '');
+}
+
 /* ── 启动 ── */
 window.addEventListener('DOMContentLoaded', () => {
   FX.initStars();
@@ -207,9 +235,20 @@ window.addEventListener('DOMContentLoaded', () => {
   /* PWA：注册 Service Worker（失败静默，不影响使用） */
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+      const hadController = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.register('service-worker.js?v=3').then(reg => {
+        reg.update();
+        /* 旧版本被新 SW 接管后自动刷新一次（首次安装不刷新，避免闪烁） */
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!hadController || reloaded) return;
+          reloaded = true;
+          location.reload();
+        });
+      }).catch(() => {});
     });
   }
+  initInstallPrompt();   /* PWA 安装引导（国产浏览器兼容） */
 
   /* 云同步：探测后端 + 已有会话则后台拉取最新数据 */
   if (typeof Sync !== 'undefined') {

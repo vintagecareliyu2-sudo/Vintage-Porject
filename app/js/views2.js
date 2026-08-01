@@ -1,51 +1,249 @@
 /* ═══════ VINTAGE Views 2：Job / EUR / Notes / Home / Pulse / Profile ═══════ */
 'use strict';
 
-/* ══════════ Job Content · 四象限 ══════════ */
-const QUADS = [
-  { k: 'todo',    name: '待完成工作',  color: '#8fb4e8' },
-  { k: 'done',    name: '完成了什么',  color: '#8fd49a' },
-  { k: 'block',   name: '问题与阻碍',  color: '#e08f8f' },
-  { k: 'improve', name: '下周改进',    color: '#D4AF37' }
+/* ══════════ Job Content · 工作事项管理 ══════════ */
+const JOB_PRIO = {
+  1: { t: '高', ico: '🔴', c: '#e08f8f' },
+  2: { t: '中', ico: '🟡', c: '#D4AF37' },
+  3: { t: '低', ico: '🟢', c: '#8fd49a' }
+};
+const JOB_CATS = ['开发', '设计', '会议', '文档', '其他'];
+const JOB_STAGES = [0, 25, 50, 75, 100];
+const JOB_NOTES = [
+  { k: 'block',   name: '问题与阻碍', color: '#e08f8f', ph: '记录卡点，例如：测试环境不稳定…' },
+  { k: 'improve', name: '下周改进',   color: '#D4AF37', ph: '记录改进项，例如：每日复盘 10 分钟…' }
 ];
+
+const jobToday = () => new Date().toISOString().slice(0, 10);
+/* 距截止天数：负数表示已逾期 */
+function jobDueDays(dl) {
+  if (!dl) return null;
+  const a = new Date(dl + 'T00:00:00'), b = new Date(jobToday() + 'T00:00:00');
+  if (isNaN(a)) return null;
+  return Math.round((a - b) / 86400000);
+}
+function jobDueHtml(dl) {
+  const n = jobDueDays(dl);
+  if (n === null) return '';
+  const txt = n < 0 ? `逾期 ${-n} 天` : n === 0 ? '今天截止' : `剩 ${n} 天`;
+  const cls = n < 0 ? 'over' : n <= 2 ? 'soon' : '';
+  return `<span class="jc-tag ${cls}">📅 ${esc(dl)} · ${txt}</span>`;
+}
+
 function jobView() {
   const mod = modOf('job'), d = Store.data().job;
-  $m().innerHTML = pageHead(mod, 'WEEKLY REVIEW') + `
-    <div class="quad-grid">${QUADS.map(q => `
-      <div class="quad glass" data-q="${q.k}">
-        <h4><span class="dot" style="background:${q.color}"></span>${q.name}
-          <span style="margin-left:auto;font-size:10px;color:var(--txt3)">${d[q.k].length}</span></h4>
-        <div class="q-list">${d[q.k].map(it => `
-          <div class="q-item ${it.done ? 'done' : ''}" data-id="${it.id}">
-            <span class="t-check" data-act="check">✓</span>
-            <span>${esc(it.text)}</span>
-            <button class="t-del" data-act="del">✕</button>
-          </div>`).join('') || '<div class="empty" style="padding:12px">—</div>'}</div>
-        <div class="q-add"><input placeholder="添加…" maxlength="80"><button class="press">＋</button></div>
-      </div>`).join('')}
-    </div>`;
+  const overdue = d.todo.filter(x => { const n = jobDueDays(x.deadline); return n !== null && n < 0; }).length;
+  const avg = d.todo.length ? Math.round(d.todo.reduce((s, x) => s + (x.stage || 0), 0) / d.todo.length) : 0;
 
-  $m().querySelectorAll('.quad').forEach(qEl => {
-    const key = qEl.dataset.q;
-    const inp = qEl.querySelector('.q-add input');
-    const add = () => {
-      const v = inp.value.trim(); if (!v) return;
-      d[key].push({ id: Store.uid(), text: v, done: false });
-      Store.save(); jobView();
-    };
-    qEl.querySelector('.q-add button').onclick = add;
-    inp.onkeydown = e => { if (e.key === 'Enter') add(); };
-    qEl.querySelectorAll('.q-item').forEach(el => el.onclick = e => {
-      const it = d[key].find(x => x.id === el.dataset.id);
-      if (e.target.dataset.act === 'del') {
-        d[key] = d[key].filter(x => x.id !== it.id); Store.save(); jobView();
-      } else if (e.target.dataset.act === 'check') {
-        it.done = !it.done; Store.save();
-        el.classList.toggle('done', it.done);
-        if (it.done) FX.burstFrom(e.target);
+  const todoHtml = d.todo.length ? d.todo.map(it => {
+    const p = JOB_PRIO[it.priority] || JOB_PRIO[2];
+    return `
+    <div class="job-card glass z-mid" data-id="${it.id}">
+      <div class="jc-top">
+        <span class="jc-prio" style="color:${p.c};border-color:${p.c}55">${p.ico} ${p.t}</span>
+        <span class="jc-title">${esc(it.title)}</span>
+        <span class="jc-cat">${esc(it.category || '其他')}</span>
+      </div>
+      ${it.desc ? `<div class="jc-desc">${esc(it.desc)}</div>` : ''}
+      <div class="jc-meta">
+        ${it.contact ? `<span class="jc-tag">👤 ${esc(it.contact)}</span>` : ''}
+        ${jobDueHtml(it.deadline)}
+      </div>
+      <div class="jc-prog">
+        <div class="prog-bar jc-bar"><div class="prog-fill" style="width:${it.stage}%"></div></div>
+        <span class="jc-pct">${it.stage}%</span>
+      </div>
+      <div class="jc-stages">${JOB_STAGES.map(s =>
+        `<button class="jc-stage ${it.stage >= s ? 'on' : ''}" data-act="stage" data-s="${s}">${s}%</button>`).join('')}</div>
+      <div class="jc-acts">
+        <button class="jc-btn ok press" data-act="finish">✓ 完成</button>
+        <button class="jc-btn press" data-act="edit">✎ 编辑</button>
+        <button class="jc-btn del press" data-act="del">✕ 删除</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">— 暂无待完成工作，点击上方新增 —</div>';
+
+  const doneHtml = d.done.length ? d.done.map(it => `
+    <div class="job-card glass done" data-id="${it.id}">
+      <div class="jc-top">
+        <span class="jc-done-ico">✓</span>
+        <span class="jc-title">${esc(it.title)}</span>
+        <span class="jc-cat">${esc(it.category || '其他')}</span>
+      </div>
+      <div class="jc-meta">
+        ${it.contact ? `<span class="jc-tag">👤 ${esc(it.contact)}</span>` : ''}
+        ${it.doneAt ? `<span class="jc-tag">✔ ${new Date(it.doneAt).toLocaleDateString('zh-CN')}</span>` : ''}
+      </div>
+      <div class="jc-acts">
+        <button class="jc-btn press" data-act="undo">↩ 撤回</button>
+        <button class="jc-btn del press" data-act="del">✕ 删除</button>
+      </div>
+    </div>`).join('') : '<div class="empty">— 还没有完成的事项 —</div>';
+
+  const notesHtml = JOB_NOTES.map(sec => `
+    <div class="job-sec glass" data-sec="${sec.k}">
+      <h4><span class="dot" style="background:${sec.color}"></span>${sec.name}
+        <span class="jc-count">${d[sec.k].length}</span></h4>
+      <div class="jn-list">${d[sec.k].map(it => `
+        <div class="jn-item" data-id="${it.id}">
+          <span class="jn-cat">${esc(it.category || '其他')}</span>
+          <span class="jn-text">${esc(it.title)}</span>
+          <button class="t-del" data-act="del">✕</button>
+        </div>`).join('') || '<div class="empty" style="padding:10px">—</div>'}</div>
+      <div class="jn-add">
+        <input class="ginput" placeholder="${sec.ph}" maxlength="80">
+        <select class="ginput jn-cat-sel">${JOB_CATS.map(c => `<option value="${c}">${c}</option>`).join('')}</select>
+        <button class="add-btn press">＋</button>
+      </div>
+    </div>`).join('');
+
+  $m().innerHTML = pageHead(mod, 'WORK TRACKER') + `
+    <div class="job-stats">
+      <div class="js-cell glass"><span class="js-n">${d.todo.length}</span><span class="js-l">待完成</span></div>
+      <div class="js-cell glass"><span class="js-n">${d.done.length}</span><span class="js-l">已完成</span></div>
+      <div class="js-cell glass"><span class="js-n ${overdue ? 'warn' : ''}">${overdue}</span><span class="js-l">已逾期</span></div>
+      <div class="js-cell glass"><span class="js-n">${avg}%</span><span class="js-l">平均进度</span></div>
+    </div>
+    <div class="job-bar">
+      <span class="job-sec-t"><span class="dot" style="background:#8fb4e8"></span>待完成工作</span>
+      <button class="add-btn press" id="job-new">＋ 新增工作事项</button>
+    </div>
+    <div class="job-list" id="job-todo">${todoHtml}</div>
+    <div class="job-bar"><span class="job-sec-t"><span class="dot" style="background:#8fd49a"></span>完成了什么</span></div>
+    <div class="job-list" id="job-done">${doneHtml}</div>
+    <div class="job-notes">${notesHtml}</div>`;
+
+  document.getElementById('job-new').onclick = () => jobForm(null, item => {
+    d.todo.unshift(item); Store.save(); jobView(); FX.toast('已新增工作事项');
+  });
+
+  /* 待完成卡片交互 */
+  $m().querySelectorAll('#job-todo .job-card').forEach(el => {
+    const it = d.todo.find(x => x.id === el.dataset.id);
+    if (!it) return;
+    el.querySelectorAll('[data-act]').forEach(btn => btn.onclick = e => {
+      const act = btn.dataset.act;
+      if (act === 'stage') {
+        it.stage = Number(btn.dataset.s); Store.save(); jobView();
+      } else if (act === 'finish') {
+        it.done = true; it.stage = 100; it.doneAt = Date.now();
+        d.todo = d.todo.filter(x => x.id !== it.id);
+        d.done.unshift(it);
+        Store.save(); FX.burstFrom(btn); jobView(); FX.toast('已移入「完成了什么」');
+      } else if (act === 'edit') {
+        jobForm(it, upd => { Object.assign(it, upd, { id: it.id }); Store.save(); jobView(); FX.toast('已更新'); });
+      } else if (act === 'del') {
+        d.todo = d.todo.filter(x => x.id !== it.id); Store.save(); jobView();
       }
     });
   });
+
+  /* 已完成卡片交互 */
+  $m().querySelectorAll('#job-done .job-card').forEach(el => {
+    const it = d.done.find(x => x.id === el.dataset.id);
+    if (!it) return;
+    el.querySelectorAll('[data-act]').forEach(btn => btn.onclick = () => {
+      if (btn.dataset.act === 'undo') {
+        it.done = false; it.doneAt = 0; if (it.stage >= 100) it.stage = 75;
+        d.done = d.done.filter(x => x.id !== it.id);
+        d.todo.unshift(it);
+        Store.save(); jobView(); FX.toast('已撤回到待完成');
+      } else {
+        d.done = d.done.filter(x => x.id !== it.id); Store.save(); jobView();
+      }
+    });
+  });
+
+  /* 问题与阻碍 / 下周改进 */
+  $m().querySelectorAll('.job-sec').forEach(secEl => {
+    const key = secEl.dataset.sec;
+    const inp = secEl.querySelector('.jn-add input');
+    const sel = secEl.querySelector('.jn-cat-sel');
+    const add = () => {
+      const v = inp.value.trim(); if (!v) return;
+      d[key].unshift(Store.jobItem({ title: v, category: sel.value }));
+      Store.save(); jobView();
+    };
+    secEl.querySelector('.jn-add button').onclick = add;
+    inp.onkeydown = e => { if (e.key === 'Enter') add(); };
+    secEl.querySelectorAll('.jn-item [data-act="del"]').forEach(b => b.onclick = () => {
+      const id = b.closest('.jn-item').dataset.id;
+      d[key] = d[key].filter(x => x.id !== id); Store.save(); jobView();
+    });
+  });
+}
+
+/* 工作事项表单弹窗：item 为空表示新增 */
+function jobForm(item, onOk) {
+  const it = item || {};
+  const box = document.createElement('div');
+  box.className = 'jf-mask';
+  box.innerHTML = `
+    <div class="jf-panel glass">
+      <div class="jf-head">${item ? '编辑工作事项' : '新增工作事项'}</div>
+      <label class="jf-lab">事项名称 <span class="jf-req">*</span></label>
+      <input class="ginput" id="jf-title" maxlength="60" placeholder="例如：完成 Q3 需求评审" value="${esc(it.title || '')}">
+      <label class="jf-lab">详细说明</label>
+      <textarea class="ginput jf-area" id="jf-desc" maxlength="500" placeholder="补充背景、交付标准…">${esc(it.desc || '')}</textarea>
+      <div class="jf-row">
+        <div class="jf-col">
+          <label class="jf-lab">对接人</label>
+          <input class="ginput" id="jf-contact" maxlength="20" placeholder="姓名 / 部门" value="${esc(it.contact || '')}">
+        </div>
+        <div class="jf-col">
+          <label class="jf-lab">优先级</label>
+          <select class="ginput" id="jf-prio">${[1, 2, 3].map(p =>
+            `<option value="${p}" ${Number(it.priority || 2) === p ? 'selected' : ''}>${JOB_PRIO[p].ico} ${JOB_PRIO[p].t}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="jf-row">
+        <div class="jf-col">
+          <label class="jf-lab">分类</label>
+          <select class="ginput" id="jf-cat">${JOB_CATS.map(c =>
+            `<option value="${c}" ${(it.category || '其他') === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
+        </div>
+        <div class="jf-col">
+          <label class="jf-lab">截止日期</label>
+          <input class="ginput" id="jf-dl" type="date" value="${esc(it.deadline || '')}">
+        </div>
+      </div>
+      <label class="jf-lab">进度阶段 · <span id="jf-pct">${Number(it.stage) || 0}%</span></label>
+      <input id="jf-stage" type="range" min="0" max="100" step="5" value="${Number(it.stage) || 0}" style="width:100%">
+      <div class="jf-msg" id="jf-msg"></div>
+      <div class="jf-btns">
+        <button class="d-btn press" id="jf-cancel">取消</button>
+        <button class="add-btn press" id="jf-ok" style="flex:1">确认</button>
+      </div>
+    </div>`;
+  document.body.appendChild(box);
+
+  const close = () => { document.removeEventListener('keydown', onKey); box.remove(); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  box.onclick = e => { if (e.target === box) close(); };
+  box.querySelector('#jf-cancel').onclick = close;
+
+  const range = box.querySelector('#jf-stage');
+  range.oninput = () => { box.querySelector('#jf-pct').textContent = range.value + '%'; };
+
+  box.querySelector('#jf-ok').onclick = () => {
+    const title = box.querySelector('#jf-title').value.trim();
+    if (!title) { box.querySelector('#jf-msg').textContent = '请填写事项名称'; return; }
+    onOk(Store.jobItem({
+      id: it.id,
+      title,
+      desc: box.querySelector('#jf-desc').value.trim(),
+      contact: box.querySelector('#jf-contact').value.trim(),
+      priority: Number(box.querySelector('#jf-prio').value),
+      category: box.querySelector('#jf-cat').value,
+      deadline: box.querySelector('#jf-dl').value,
+      stage: Number(range.value),
+      done: !!it.done,
+      createdAt: it.createdAt
+    }));
+    close();
+  };
+  setTimeout(() => box.querySelector('#jf-title').focus(), 50);
 }
 
 /* ══════════ EUR trvl ══════════ */
