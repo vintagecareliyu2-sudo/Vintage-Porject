@@ -34,11 +34,11 @@ const Store = (() => {
 
   function defaultData() {
     return {
-      study:   { tasks: [], links: [], days: {}, pomo: { total: 0, running: false, startedAt: 0, daySec: {}, migrated: 1 } },
-      private: { tasks: [], links: [] },
-      ai:      { tasks: [], links: [] },
-      movie:   { tasks: [], links: [] },
-      book:    { tasks: [], links: [] },
+      study:   { tasks: [], links: [], days: {}, pomo: { total: 0, running: false, startedAt: 0, daySec: {}, migrated: 1 }, subjectPreset: 'general' },
+      private: { items: [], links: [] },
+      ai:      { tasks: [], prompts: [], chats: [], links: [] },
+      movie:   { movies: [], tasks: [], links: [] },
+      book:    { books: [], tasks: [], links: [] },
       job:     { todo: [], done: [], block: [], improve: [] },
       eur:     { cities: [], luggage: [], amapKey: '' },
       kr:      { days: {} },
@@ -51,8 +51,10 @@ const Store = (() => {
 
   function seed(d) {
     const t = (title) => ({ id: uid(), title, done: false, images: [], note: '', logs: [] });
-    d.movie.tasks.push(t('示例：星际穿越（重看）'));
-    d.book.tasks.push(t('示例：《置身事内》第三章'));
+    d.movie.movies.push({ id: uid(), title: '星际穿越', director: '克里斯托弗·诺兰', country: '美国/英国', watchDate: '', progress: 60, rating: 5, watched: false, ticketImg: '', reminder: '', note: '', images: [] });
+    d.book.books.push({ id: uid(), title: '置身事内', author: '兰小欢', pageTotal: 302, pageCurrent: 45, progress: 15, finished: false, review: '', images: [], startDate: new Date().toISOString().slice(0,10), finishDate: '' });
+    d.ai.prompts.push({ id: uid(), title: '英语翻译助手', body: '你是一位专业翻译，请将以下中文翻译为自然流畅的英文，保持原文语气和风格。', created: Date.now() });
+    d.private.items.push({ id: uid(), title: '示例：重要文件密码', cat: '账号密码', sens: '机密', done: false });
     d.eur.cities.push({ id: uid(), name: 'PARIS', days: [{ id: uid(), title: 'DAY 1 · 抵达', items: [
       { id: uid(), text: '戴高乐机场 → 市区 RER B', cat: '交通', done: false },
       { id: uid(), text: '入住玛黑区酒店', cat: '住宿', done: false },

@@ -350,8 +350,10 @@ function accAvatarHtml(acc, size) {
 /* ══════════ Home 总览 ══════════ */
 function homeView() {
   const d = Store.data();
-  const todoMods = ['private', 'ai', 'movie', 'book'];
+  const todoMods = ['private', 'ai'];
   const openTasks = todoMods.reduce((s, k) => s + d[k].tasks.filter(t => !t.done).length, 0);
+  const openMovies = (d.movie.movies || []).filter(m => !m.watched).length;
+  const readingBooks = (d.book.books || []).filter(b => !b.finished && (b.progress || 0) > 0).length;
   const focusToday = Math.floor(pomoTodaySec(d.study.pomo) / 60);
   /* 本周打卡（kr / us / study） */
   const now = new Date(); const dow = (now.getDay() + 6) % 7;
@@ -388,7 +390,9 @@ function homeView() {
     <div class="sec-label">MODULES · 全部模块</div>
     <div class="mod-grid">${MODULES.map(m => {
       let cnt = '';
-      if (['private', 'ai', 'movie', 'book'].includes(m.id)) cnt = d[m.id].tasks.filter(t => !t.done).length + ' 待办';
+      if (['private', 'ai'].includes(m.id)) cnt = d[m.id].tasks.filter(t => !t.done).length + ' 待办';
+      else if (m.id === 'movie') cnt = (d.movie.movies || []).length + ' 部';
+      else if (m.id === 'book') cnt = (d.book.books || []).length + ' 本';
       else if (m.id === 'study') cnt = (dayScore(d.study.days[today], STUDY_MODS) || 0) + '/5 今日';
       else if (m.id === 'job') cnt = d.job.todo.filter(x => !x.done).length + ' 待完成';
       else if (m.id === 'eur') cnt = d.eur.cities.length + ' 城市';

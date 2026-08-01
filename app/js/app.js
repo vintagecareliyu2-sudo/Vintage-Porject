@@ -5,7 +5,7 @@
 function renderSidebar(activeId) {
   const nav = document.getElementById('side-menu');
   nav.innerHTML = MODULES.map((m, i) => {
-    const hasSub = ['study', 'ai', 'kr', 'us', 'eur', 'notes'].includes(m.id);
+    const hasSub = ['study', 'ai', 'kr', 'us', 'eur', 'notes', 'movie', 'book', 'private'].includes(m.id);
     return `${i ? '<hr class="mdivider">' : ''}
     <div class="menu-item ${m.id === activeId ? 'active' : ''}" data-go="${m.id}">
       ${modIcon(m)}<span class="menu-label">${esc(modLabel(m))}</span>
@@ -78,7 +78,7 @@ function route() {
   if (!Store.current()) return;
   const seg = (location.hash.slice(2) || 'home').split('/');
   const [mod, sub, id] = seg;
-  const todoMods = ['study', 'private', 'ai', 'movie', 'book'];
+  const todoMods = ['private', 'ai', 'movie', 'book'];
   let navKey = 'home';
 
   try {
@@ -89,8 +89,15 @@ function route() {
     else if (todoMods.includes(mod)) {
       navKey = 'modules';
       if (sub === 't' && id) taskDetailView(mod, id);
+      else if (mod === 'movie' && sub === 'm' && id) movieDetailView(id);
+      else if (mod === 'book' && sub === 'b' && id) bookDetailView(id);
+      else if (mod === 'movie') movieListView();
+      else if (mod === 'ai') aiSkillView();
+      else if (mod === 'book') bookView();
+      else if (mod === 'private') privateView();
       else todoListView(mod);
     }
+    else if (mod === 'study') { langView('study'); navKey = 'pulse'; }
     else if (mod === 'job') { jobView(); navKey = 'modules'; }
     else if (mod === 'eur') {
       navKey = 'modules';
