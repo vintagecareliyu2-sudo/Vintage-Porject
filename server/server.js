@@ -21,7 +21,10 @@ function loadUsers() {
   catch (e) { return {}; }
 }
 function saveUsers(u) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(u, null, 2));
+  /* 原子写入：先写临时文件再 rename，避免写入中途进程崩溃导致 users.json 损坏 */
+  const tmp = USERS_FILE + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(u, null, 2));
+  fs.renameSync(tmp, USERS_FILE);
 }
 let _users = loadUsers();
 function persist() { saveUsers(_users); }
@@ -58,11 +61,11 @@ function authEmail(req) {
 function newToken() { return crypto.randomBytes(24).toString('hex'); }
 
 const DEFAULT_DATA = {
-  study:   { tasks: [], links: [], days: {}, pomo: { total: 0, running: false, startedAt: 0, daySec: {}, migrated: 1 } },
-  private: { tasks: [], links: [] },
-  ai:      { tasks: [], links: [] },
-  movie:   { tasks: [], links: [] },
-  book:    { tasks: [], links: [] },
+  study:   { tasks: [], links: [], days: {}, pomo: { total: 0, running: false, startedAt: 0, daySec: {}, migrated: 1 }, subjectPreset: 'general' },
+  private: { items: [], links: [] },
+  ai:      { tasks: [], prompts: [], chats: [], links: [] },
+  movie:   { movies: [], tasks: [], links: [] },
+  book:    { books: [], tasks: [], links: [] },
   job:     { todo: [], done: [], block: [], improve: [] },
   eur:     { cities: [], luggage: [], amapKey: '' },
   kr:      { days: {} },
@@ -71,6 +74,51 @@ const DEFAULT_DATA = {
   profile: { name: '', avatar: '' },
   custom:  {}
 };
+
+/* ── 数据规范化 / 旧数据迁移（注册与 POST /api/data 共用）──
+ * 深度合并 DEFAULT_DATA，保证云端存储的结构始终与前端一致，
+ * 旧账号缺字段时自动补齐，不会因为后端默认值过期而归零。 */
+function normalizeData(input) {
+  const def = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  const d = input && typeof input === 'object' ? input : {};
+  for (const k in def) if (d[k] === undefined) d[k] = def[k];
+
+  const study = d.study || (d.study = def.study);
+  if (!study.pomo) study.pomo = def.study.pomo;
+  else for (const k in def.study.pomo) if (study.pomo[k] === undefined) study.pomo[k] = def.study.pomo[k];
+  if (!study.days) study.days = {};
+  if (study.subjectPreset === undefined) study.subjectPreset = 'general';
+  if (!Array.isArray(study.tasks)) study.tasks = [];
+  if (!Array.isArray(study.links)) study.links = [];
+
+  const priv = d.private || (d.private = def.private);
+  if (!Array.isArray(priv.items)) priv.items = [];
+  if (!Array.isArray(priv.links)) priv.links = [];
+
+  const ai = d.ai || (d.ai = def.ai);
+  ['tasks', 'prompts', 'chats', 'links'].forEach(k => { if (!Array.isArray(ai[k])) ai[k] = []; });
+
+  const mv = d.movie || (d.movie = def.movie);
+  ['movies', 'tasks', 'links'].forEach(k => { if (!Array.isArray(mv[k])) mv[k] = []; });
+
+  const bk = d.book || (d.book = def.book);
+  ['books', 'tasks', 'links'].forEach(k => { if (!Array.isArray(bk[k])) bk[k] = []; });
+
+  const job = d.job || (d.job = def.job);
+  ['todo', 'done', 'block', 'improve'].forEach(k => { if (!Array.isArray(job[k])) job[k] = []; });
+
+  const eur = d.eur || (d.eur = def.eur);
+  if (!Array.isArray(eur.cities)) eur.cities = [];
+  if (!Array.isArray(eur.luggage)) eur.luggage = [];
+  if (eur.amapKey === undefined) eur.amapKey = '';
+
+  if (!d.kr) d.kr = { days: {} }; if (!d.kr.days) d.kr.days = {};
+  if (!d.us) d.us = { days: {} }; if (!d.us.days) d.us.days = {};
+  if (!Array.isArray(d.notes)) d.notes = [];
+  if (!d.profile) d.profile = { name: '', avatar: '' };
+  if (!d.custom) d.custom = {};
+  return d;
+}
 
 /* ── API 处理 ── */
 async function handleApi(req, res, url) {
@@ -88,7 +136,7 @@ async function handleApi(req, res, url) {
     _users[email] = {
       email, salt, hash: hashPass(pass, salt),
       token: newToken(), created: Date.now(),
-      data: JSON.parse(JSON.stringify(DEFAULT_DATA))
+      data: normalizeData({})
     };
     persist();
     return sendJSON(res, 200, { ok: true, token: _users[email].token, data: _users[email].data, created: _users[email].created });
@@ -117,9 +165,8 @@ async function handleApi(req, res, url) {
     if (!em) return sendJSON(res, 401, { msg: '未登录或登录已过期' });
     const body = await readBody(req);
     if (!body || !body.data) return sendJSON(res, 400, { msg: '数据为空' });
-    // 结构合并，防止客户端缺字段
-    const merged = Object.assign(JSON.parse(JSON.stringify(DEFAULT_DATA)), body.data);
-    merged.profile = Object.assign({ name: '', avatar: '' }, body.data.profile || {});
+    // 结构规范化 + 旧数据迁移，保证云端结构与前端一致
+    const merged = normalizeData(body.data);
     _users[em].data = merged;
     _users[em].updated = Date.now();
     persist();
@@ -132,6 +179,32 @@ async function handleApi(req, res, url) {
     if (!em) return sendJSON(res, 401, { msg: '未登录' });
     const u = _users[em];
     return sendJSON(res, 200, { ok: true, email: em, name: (u.data.profile && u.data.profile.name) || '', created: u.created });
+  }
+
+  /* 登出（使当前 token 失效，防止旧 token 被复用） */
+  if (p === '/api/logout' && req.method === 'POST') {
+    const em = authEmail(req);
+    if (em) { _users[em].token = newToken(); persist(); }
+    return sendJSON(res, 200, { ok: true });
+  }
+
+  /* 修改密码（需原密码校验） */
+  if (p === '/api/reset-password' && req.method === 'POST') {
+    const { email, oldPass, newPass } = await readBody(req);
+    if (!email || !oldPass || !newPass) return sendJSON(res, 400, { msg: '缺少必要字段' });
+    if (newPass.length < 4) return sendJSON(res, 400, { msg: '新密码至少 4 位' });
+    const u = _users[email];
+    if (!u) return sendJSON(res, 401, { msg: '账号不存在' });
+    if (u.hash !== hashPass(oldPass, u.salt)) return sendJSON(res, 401, { msg: '原密码不正确' });
+    u.salt = makeSalt(); u.hash = hashPass(newPass, u.salt); u.token = newToken(); persist();
+    return sendJSON(res, 200, { ok: true, token: u.token });
+  }
+
+  /* 导出本人云端数据（打包备份，供本机导入恢复） */
+  if (p === '/api/export' && req.method === 'GET') {
+    const em = authEmail(req);
+    if (!em) return sendJSON(res, 401, { msg: '未登录' });
+    return sendJSON(res, 200, { ok: true, email: em, data: _users[em].data, exported: Date.now() });
   }
 
   return sendJSON(res, 404, { msg: 'unknown api' });

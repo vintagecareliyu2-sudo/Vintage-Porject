@@ -136,12 +136,16 @@ const Store = (() => {
     return { ok: true };
   }
 
-  function resetPass(email, newPass) {
-    if (typeof Sync !== 'undefined' && Sync.enabled() && isEmail(email))
-      return { ok: false, msg: '云端账号暂不支持重置，请重新注册或使用本地账号' };
+  function resetPass(email, oldPass, newPass) {
+    if (typeof Sync !== 'undefined' && Sync.enabled() && isEmail(email)) {
+      return Sync.resetPassword(email, oldPass, newPass)
+        .then(() => ({ ok: true }))
+        .catch(e => ({ ok: false, msg: e.message || '修改失败' }));
+    }
     const list = accounts();
     const acc = list.find(a => a.email === email);
     if (!acc) return { ok: false, msg: '账号不存在' };
+    if (oldPass && acc.pass !== hash(oldPass)) return { ok: false, msg: '原密码不正确' };
     acc.pass = hash(newPass); saveAccounts(list);
     return { ok: true };
   }

@@ -124,6 +124,7 @@ function initLogin() {
   let idType = 'email';
   const $id = document.getElementById('l-id');
   const $p1 = document.getElementById('l-pass');
+  const $p0 = document.getElementById('l-pass0');
   const $p2 = document.getElementById('l-pass2');
   const $msg = document.getElementById('l-msg');
   const $go = document.getElementById('l-go');
@@ -132,6 +133,7 @@ function initLogin() {
 
   function paint() {
     $p2.classList.toggle('hidden', mode === 'login');
+    $p0.classList.toggle('hidden', mode !== 'reset');
     $go.textContent = mode === 'login' ? '登 录' : mode === 'register' ? '注 册' : '重置密码';
     $sw.textContent = mode === 'login' ? '注册新账号' : '返回登录';
     $rs.style.visibility = mode === 'login' ? 'visible' : 'hidden';
@@ -173,7 +175,7 @@ function initLogin() {
         enterApp();
       } else {
         if (p1 !== p2) { $msg.textContent = '两次密码不一致'; return; }
-        const r = Store.resetPass(idv, p1);
+        const r = await Store.resetPass(idv, $p0.value, p1);
         $msg.textContent = r.ok ? '密码已重置，请登录' : r.msg;
         if (r.ok) { $msg.classList.add('ok'); mode = 'login'; setTimeout(paint, 900); }
       }

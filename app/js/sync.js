@@ -82,8 +82,15 @@ const Sync = (() => {
   }
   function logout() { setToken(''); setCloudEmail(''); setStatus('local'); }
 
+  async function resetPassword(email, oldPass, newPass) {
+    await detect();
+    const j = await api('/api/reset-password', { method: 'POST', body: JSON.stringify({ email, oldPass, newPass }) });
+    setToken(j.token); setStatus('cloud');
+    return { ok: true };
+  }
+
   return {
-    detect, register, login, pull, push, logout,
+    detect, register, login, pull, push, logout, resetPassword,
     enabled: () => _mode === 'cloud',
     isCloudEmail: (em) => cloudEmail() === em,
     status: () => _status,
